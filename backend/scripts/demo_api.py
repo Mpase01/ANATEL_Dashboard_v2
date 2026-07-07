@@ -62,25 +62,27 @@ class DemoApiHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         path = parsed.path
+        query = parse_qs(parsed.query)
+        period = query.get("period", ["all"])[0]
 
         if path == "/health":
             self._send_json({"status": "ok", "mode": "demo_api"})
             return
 
         if path == "/providers/search":
-            query = parse_qs(parsed.query).get("query", [""])[0].strip().lower()
-            digits = "".join(character for character in query if character.isdigit())
-            matches_name = query in DEMO_PROVIDER["name"].lower()
+            search_query = query.get("query", [""])[0].strip().lower()
+            digits = "".join(character for character in search_query if character.isdigit())
+            matches_name = search_query in DEMO_PROVIDER["name"].lower()
             matches_cnpj = bool(digits and digits in DEMO_PROVIDER["cnpj"])
-            self._send_json([DEMO_PROVIDER] if matches_name or matches_cnpj or not query else [])
+            self._send_json([DEMO_PROVIDER] if matches_name or matches_cnpj or not search_query else [])
             return
 
         if path == "/providers/2/summary":
-            self._send_json(DEMO_SUMMARY)
+            self._send_json(build_summary(period))
             return
 
         if path == "/providers/2/evolution":
-            self._send_json(DEMO_EVOLUTION)
+            self._send_json(filter_evolution(period))
             return
 
         if path == "/providers/2/technologies":
@@ -115,6 +117,27 @@ def main() -> None:
     server = ThreadingHTTPServer(("127.0.0.1", 8000), DemoApiHandler)
     print("ANATEL demo API running at http://127.0.0.1:8000")
     server.serve_forever()
+
+
+def filter_evolution(period: str) -> list[dict[str, object]]:
+    if period == "latest":
+        return DEMO_EVOLUTION[-1:]
+    if period == "last3":
+        return DEMO_EVOLUTION[-3:]
+    return DEMO_EVOLUTION
+
+
+def build_summary(period: str) -> dict[str, object]:
+    evolution = filter_evolution(period)
+    first_value = int(evolution[0]["subscriptions_count"]) if evolution else 0
+    last_value = int(evolution[-1]["subscriptions_count"]) if evolution else 0
+    growth = ((last_value - first_value) / first_value) * 100 if first_value else 0
+    return {
+        **DEMO_SUMMARY,
+        "period": evolution[-1]["period"] if evolution else DEMO_SUMMARY["period"],
+        "subscriptions_count": last_value or DEMO_SUMMARY["subscriptions_count"],
+        "growth_percent": round(growth, 2),
+    }
 
 
 if __name__ == "__main__":
