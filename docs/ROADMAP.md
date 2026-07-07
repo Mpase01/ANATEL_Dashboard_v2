@@ -240,7 +240,25 @@ Status:
 
 Concluida.
 
-## Sprint 13 - Backend real com Supabase
+## Sprint 13 - Filtro temporal no contrato da API
+
+Objetivo:
+
+Mover o recorte temporal para a API, mantendo a tela simples e preparando o sistema para bases maiores.
+
+Entregaveis:
+
+- parametro `period=all|last3|latest` nos endpoints do dashboard;
+- frontend enviando o periodo selecionado para a API;
+- API local de demonstracao respeitando o mesmo contrato;
+- consultas reais preparadas para limitar os periodos no banco;
+- validacao local no navegador.
+
+Status:
+
+Concluida.
+
+## Sprint 14 - Backend real com Supabase
 
 Objetivo:
 
@@ -252,9 +270,12 @@ Entregaveis previstos:
 - FastAPI real rodando localmente;
 - `DATABASE_URL` local configurado com seguranca;
 - tela consumindo endpoints reais;
-- parametros de periodo nos endpoints;
 - mensagens melhores para erro de API;
 - preparacao para importacao completa com progresso.
+
+Status:
+
+Planejada.
 
 ## Sprint futura - Mapas
 
