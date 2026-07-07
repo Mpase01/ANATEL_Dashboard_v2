@@ -105,22 +105,40 @@ Status:
 
 Concluida.
 
-## Sprint 6 - Conexao com banco e endpoints iniciais
+## Sprint 6 - Conexao com banco e busca inicial
 
 Objetivo:
 
-Conectar o backend ao PostgreSQL/Supabase e iniciar endpoints de negocio.
+Preparar o backend para conectar ao PostgreSQL/Supabase e iniciar o primeiro endpoint de negocio.
+
+Entregaveis:
+
+- camada de sessao SQLAlchemy;
+- repositorio inicial de provedores;
+- endpoint `GET /providers/search`;
+- guia `docs/SUPABASE_SETUP.md`;
+- testes sem banco real.
+
+Status:
+
+Concluida.
+
+## Sprint 7 - Supabase real e gravacao inicial
+
+Objetivo:
+
+Conectar um projeto Supabase real, aplicar o schema em ambiente vazio ou de teste e gravar uma primeira importacao controlada.
 
 Entregaveis previstos:
 
-- orientacao para criar/conectar Supabase;
-- configuracao local segura do `.env`;
-- aplicacao revisada do schema;
-- gravacao inicial de importacoes;
-- endpoint de busca por provedor;
-- endpoint de resumo basico.
+- projeto Supabase conectado;
+- `.env` local configurado;
+- schema aplicado;
+- teste de conexao real;
+- gravacao de provedores e aliases;
+- gravacao inicial de registros normalizados.
 
-## Sprint 7 - Dashboard inicial
+## Sprint 8 - Dashboard inicial
 
 Objetivo:
 
@@ -134,7 +152,7 @@ Entregaveis previstos:
 - tabelas por UF e municipio;
 - composicao por tecnologia.
 
-## Sprint 8 - Otimizacao e experiencia
+## Sprint 9 - Otimizacao e experiencia
 
 Objetivo:
 
