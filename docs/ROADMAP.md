@@ -220,15 +220,37 @@ Status:
 
 Concluida.
 
-## Sprint 12 - API real local e filtros no backend
+## Sprint 12 - API local de demonstracao
 
 Objetivo:
 
-Ligar a tela local ao backend real e preparar filtros de periodo calculados pela API.
+Criar uma API local sem dependencias externas para validar o contrato do dashboard antes da conexao real ao Supabase.
+
+Entregaveis:
+
+- script `backend/scripts/demo_api.py`;
+- API local em `http://127.0.0.1:8000`;
+- endpoint de saude;
+- busca de prestadora;
+- endpoints de resumo, evolucao, tecnologias e municipios;
+- dashboard consumindo a API local;
+- documentacao da sprint.
+
+Status:
+
+Concluida.
+
+## Sprint 13 - Backend real com Supabase
+
+Objetivo:
+
+Ligar a tela local ao backend real e ao Supabase, substituindo a API de demonstracao no uso normal.
 
 Entregaveis previstos:
 
-- backend local rodando com conexao real;
+- dependencias do backend instaladas ou preparadas;
+- FastAPI real rodando localmente;
+- `DATABASE_URL` local configurado com seguranca;
 - tela consumindo endpoints reais;
 - parametros de periodo nos endpoints;
 - mensagens melhores para erro de API;
