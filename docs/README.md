@@ -16,6 +16,7 @@ O objetivo da documentacao e manter o projeto simples de entender, facil de evol
 8. `ROADMAP.md` - organiza o projeto por fases e sprints.
 9. `DECISIONS.md` - registra decisoes tecnicas importantes.
 10. `SPRINT_1.md` - resume a primeira sprint de documentacao.
+11. `SPRINT_2.md` - resume a estrutura inicial do projeto.
 
 ## Principio central
 
