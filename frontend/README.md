@@ -6,34 +6,55 @@ Esta camada apresenta o dashboard online de forma simples, rapida e responsiva.
 
 ## Status atual
 
-A primeira tela funcional foi criada na Sprint 10.
+A primeira tela funcional foi criada na Sprint 10 e polida na Sprint 11.
 
 Ela permite:
 
-- buscar uma prestadora pela API;
+- buscar uma prestadora;
 - selecionar uma prestadora encontrada;
 - visualizar indicadores principais;
+- filtrar o recorte entre todos os meses, ultimos 3 meses e ultimo mes;
 - ver a evolucao mensal;
 - ver a composicao por tecnologia;
 - ver os municipios do ultimo mes disponivel.
 
 ## Como abrir localmente
 
-Primeiro, o backend precisa estar rodando em:
+Durante o desenvolvimento, a tela pode ser servida localmente.
+
+Exemplo:
+
+```text
+http://127.0.0.1:5173/
+```
+
+Por padrao, a tela tenta consultar a API em:
 
 ```text
 http://localhost:8000
 ```
 
-Depois, abra o arquivo:
+Se a API nao estiver rodando, a tela entra em modo demonstracao.
+
+## Modo demonstracao
+
+O modo demonstracao usa a amostra real validada na Sprint 9.
+
+Ele existe para permitir que a interface seja avaliada antes de configurar o backend local com credenciais reais.
+
+Dados demonstrativos atuais:
 
 ```text
-frontend/index.html
+Prestadora: NET-UAI INTERNET WIRELESS
+CNPJ: 10785849000171
+Periodo: 2026-01 a 2026-05
+Ultimo mes: 105 acessos
+Municipios: 2
 ```
 
-Por padrao, a tela consulta a API em `http://localhost:8000`.
+## API customizada
 
-Se precisar apontar para outro endereco, defina no navegador:
+Se precisar apontar para outro endereco de API, defina no navegador:
 
 ```text
 window.ANATEL_API_BASE_URL = "http://outro-endereco"
