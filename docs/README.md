@@ -18,6 +18,7 @@ O objetivo da documentacao e manter o projeto simples de entender, facil de evol
 10. `SPRINT_1.md` - resume a primeira sprint de documentacao.
 11. `SPRINT_2.md` - resume a estrutura inicial do projeto.
 12. `SPRINT_3.md` - resume o modelo inicial do banco baseado nos CSVs reais.
+13. `SPRINT_4.md` - resume o importador inicial dos CSVs da ANATEL.
 
 ## Principio central
 
