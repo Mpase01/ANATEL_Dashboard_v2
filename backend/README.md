@@ -39,6 +39,36 @@ O modulo `app/importer/anatel_csv.py` ja consegue:
 - ignorar meses com zero assinantes;
 - calcular `source_row_hash` da linha original.
 
+## Persistencia inicial
+
+O modulo `app/importer/persistence.py` prepara os registros importados para gravacao futura nas tabelas:
+
+- `providers`;
+- `provider_aliases`;
+- `subscription_records`.
+
+Ele ainda nao grava em banco real.
+
+## API inicial
+
+O modulo `app/api/app.py` contem o esqueleto da API FastAPI.
+
+Endpoint inicial:
+
+```text
+GET /health
+```
+
+## Dependencias planejadas
+
+As dependencias iniciais do backend estao em:
+
+```text
+backend/requirements.txt
+```
+
+Elas ainda nao precisam ser instaladas para rodar os testes atuais.
+
 ## Testes
 
 Para rodar os testes do backend:
@@ -55,6 +85,6 @@ Nenhuma chave administrativa do Supabase deve ir para o frontend.
 
 ## Status
 
-A estrutura inicial existe e o primeiro modulo do importador foi criado.
+A estrutura inicial existe, o primeiro modulo do importador foi criado e a preparacao de persistencia foi iniciada.
 
-Ainda nao ha API, conexao com banco ou gravacao no Supabase.
+Ainda nao ha conexao com banco, gravacao no Supabase ou endpoints de negocio.
