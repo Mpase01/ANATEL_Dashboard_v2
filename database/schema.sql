@@ -87,6 +87,15 @@ create index if not exists idx_providers_primary_name
 create index if not exists idx_provider_aliases_alias_name
     on provider_aliases using btree (alias_name);
 
+create index if not exists idx_import_files_import_batch_id
+    on import_files (import_batch_id);
+
+create index if not exists idx_subscription_records_import_batch_id
+    on subscription_records (import_batch_id);
+
+create index if not exists idx_subscription_records_import_file_id
+    on subscription_records (import_file_id);
+
 create index if not exists idx_subscription_records_provider_period
     on subscription_records (provider_id, period);
 
