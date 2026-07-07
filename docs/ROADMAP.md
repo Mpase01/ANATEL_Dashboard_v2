@@ -90,16 +90,37 @@ Concluida.
 
 Objetivo:
 
-Preparar a gravacao dos dados importados e iniciar os endpoints principais.
+Preparar a gravacao dos dados importados e iniciar a estrutura minima da API.
+
+Entregaveis:
+
+- configuracao por variaveis de ambiente;
+- preparacao de linhas para `providers`, `provider_aliases` e `subscription_records`;
+- esqueleto FastAPI;
+- endpoint `GET /health`;
+- dependencias planejadas do backend;
+- testes de persistencia sem banco real.
+
+Status:
+
+Concluida.
+
+## Sprint 6 - Conexao com banco e endpoints iniciais
+
+Objetivo:
+
+Conectar o backend ao PostgreSQL/Supabase e iniciar endpoints de negocio.
 
 Entregaveis previstos:
 
-- criacao de lotes de importacao em codigo;
-- preparacao para gravar `providers`, `provider_aliases`, `import_batches`, `import_files` e `subscription_records`;
-- primeiros endpoints de saude e busca;
-- orientacao para conectar Supabase.
+- orientacao para criar/conectar Supabase;
+- configuracao local segura do `.env`;
+- aplicacao revisada do schema;
+- gravacao inicial de importacoes;
+- endpoint de busca por provedor;
+- endpoint de resumo basico.
 
-## Sprint 6 - Dashboard inicial
+## Sprint 7 - Dashboard inicial
 
 Objetivo:
 
@@ -113,7 +134,7 @@ Entregaveis previstos:
 - tabelas por UF e municipio;
 - composicao por tecnologia.
 
-## Sprint 7 - Otimizacao e experiencia
+## Sprint 8 - Otimizacao e experiencia
 
 Objetivo:
 
