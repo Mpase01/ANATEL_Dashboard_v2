@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ANATEL Dashboard</title>
+    <link rel="stylesheet" href="src/styles/app.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">ANATEL Dashboard</p>
+          <h1>Analise de banda larga fixa</h1>
+        </div>
+        <span class="status" id="apiStatus">API nao verificada</span>
+      </header>
+
+      <section class="toolbar" aria-label="Busca de prestadora">
+        <label class="search-field">
+          <span>Prestadora ou CNPJ</span>
+          <input id="providerQuery" type="search" value="NET" autocomplete="off" />
+        </label>
+        <button id="searchButton" type="button">Buscar</button>
+        <select id="providerSelect" aria-label="Prestadora encontrada"></select>
+      </section>
+
+      <p class="notice">
+        Dados atuais de amostra: recorte pequeno do CSV 2026 e uma amostra ficticia de teste.
+      </p>
+
+      <section class="summary-grid" aria-label="Indicadores principais">
+        <article class="metric">
+          <span>Assinantes no ultimo mes</span>
+          <strong id="metricSubscriptions">-</strong>
+        </article>
+        <article class="metric">
+          <span>Participacao fibra</span>
+          <strong id="metricFiber">-</strong>
+        </article>
+        <article class="metric">
+          <span>Municipios atendidos</span>
+          <strong id="metricMunicipalities">-</strong>
+        </article>
+        <article class="metric">
+          <span>Crescimento no recorte</span>
+          <strong id="metricGrowth">-</strong>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <section class="panel wide" aria-labelledby="evolutionTitle">
+          <div class="panel-heading">
+            <div>
+              <h2 id="evolutionTitle">Evolucao mensal</h2>
+              <p id="providerSubtitle">Selecione uma prestadora</p>
+            </div>
+            <span id="latestPeriod" class="chip">-</span>
+          </div>
+          <div id="evolutionChart" class="bar-chart"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="techTitle">
+          <h2 id="techTitle">Tecnologias</h2>
+          <div id="technologyList" class="stack-list"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="cityTitle">
+          <h2 id="cityTitle">Municipios</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Municipio</th>
+                  <th>UF</th>
+                  <th>Acessos</th>
+                </tr>
+              </thead>
+              <tbody id="municipalityRows"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="src/pages/dashboard.js"></script>
+  </body>
+</html>
