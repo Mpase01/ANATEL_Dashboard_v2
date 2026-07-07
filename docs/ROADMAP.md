@@ -187,26 +187,33 @@ Objetivo:
 
 Criar a primeira versao funcional do dashboard online consultando os dados ja gravados.
 
-Entregaveis previstos:
+Entregaveis:
 
+- endpoints de resumo, evolucao, tecnologias e municipios;
 - tela de busca;
 - cards de indicadores;
-- grafico de evolucao;
-- tabelas por UF e municipio;
-- composicao por tecnologia.
+- grafico simples de evolucao;
+- composicao por tecnologia;
+- tabela por municipio;
+- aviso de que os dados atuais ainda sao amostras.
 
-## Sprint 11 - Otimizacao e experiencia
+Status:
+
+Concluida.
+
+## Sprint 11 - Rodar e polir localmente
 
 Objetivo:
 
-Melhorar desempenho, mensagens de usuario e estabilidade do fluxo de importacao.
+Rodar backend e frontend juntos, corrigir detalhes de experiencia e preparar a proxima etapa de carga maior.
 
 Entregaveis previstos:
 
-- feedback de progresso;
-- tratamento de erros;
-- otimizacoes de consulta;
-- ajustes visuais.
+- verificacao local da tela no navegador;
+- ajustes visuais finos;
+- mensagens de erro melhores;
+- planejamento da importacao completa;
+- primeiros cuidados de performance para base grande.
 
 ## Sprint futura - Mapas
 
