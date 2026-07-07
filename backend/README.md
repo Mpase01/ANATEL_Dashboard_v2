@@ -26,6 +26,27 @@ backend/
   tests/            # testes automatizados do backend
 ```
 
+## Importador inicial
+
+O modulo `app/importer/anatel_csv.py` ja consegue:
+
+- ler CSV da ANATEL;
+- detectar separador;
+- detectar encoding;
+- identificar colunas mensais no formato `YYYY-MM`;
+- normalizar cabecalhos com ou sem acento;
+- transformar meses em registros;
+- ignorar meses com zero assinantes;
+- calcular `source_row_hash` da linha original.
+
+## Testes
+
+Para rodar os testes do backend:
+
+```text
+python -m unittest discover -s backend/tests
+```
+
 ## Regra importante
 
 O backend sera o unico lugar com acesso a credenciais sensiveis do banco.
@@ -34,6 +55,6 @@ Nenhuma chave administrativa do Supabase deve ir para o frontend.
 
 ## Status
 
-Nesta sprint, apenas a estrutura inicial foi criada.
+A estrutura inicial existe e o primeiro modulo do importador foi criado.
 
-Nenhuma funcionalidade de API, banco ou importador foi implementada ainda.
+Ainda nao ha API, conexao com banco ou gravacao no Supabase.
