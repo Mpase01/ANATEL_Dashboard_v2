@@ -27,7 +27,7 @@ Entregaveis:
 
 Status:
 
-Em andamento.
+Concluida.
 
 ## Sprint 2 - Estrutura inicial do projeto
 
@@ -35,13 +35,17 @@ Objetivo:
 
 Criar a estrutura base do backend e do frontend, ainda sem funcionalidades completas.
 
-Entregaveis previstos:
+Entregaveis:
 
 - pastas principais do backend;
 - pastas principais do frontend;
 - arquivos de configuracao iniciais;
 - padrao de variaveis de ambiente;
-- instrucoes de execucao local.
+- instrucoes iniciais de organizacao.
+
+Status:
+
+Concluida.
 
 ## Sprint 3 - Modelo de banco
 
@@ -55,6 +59,10 @@ Entregaveis previstos:
 - indices iniciais;
 - constraints importantes;
 - registro de lotes de importacao.
+
+Observacao:
+
+Antes desta sprint, o ideal e analisar uma planilha real da ANATEL para confirmar a estrutura dos dados.
 
 ## Sprint 4 - Importador inicial
 
