@@ -1,4 +1,4 @@
-import { checkHealth, getProviderDashboard, searchProviders } from "../services/api.js";
+import { checkHealth, getProviderDashboard, isDemoMode, searchProviders } from "../services/api.js";
 
 const formatInteger = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
 const formatPercent = new Intl.NumberFormat("pt-BR", {
@@ -11,6 +11,7 @@ const elements = {
   providerQuery: document.querySelector("#providerQuery"),
   searchButton: document.querySelector("#searchButton"),
   providerSelect: document.querySelector("#providerSelect"),
+  periodFilter: document.querySelector("#periodFilter"),
   metricSubscriptions: document.querySelector("#metricSubscriptions"),
   metricFiber: document.querySelector("#metricFiber"),
   metricMunicipalities: document.querySelector("#metricMunicipalities"),
@@ -41,15 +42,17 @@ function bindEvents() {
       loadDashboard(providerId);
     }
   });
+  elements.periodFilter.addEventListener("change", () => {
+    const providerId = Number(elements.providerSelect.value);
+    if (providerId) {
+      loadDashboard(providerId);
+    }
+  });
 }
 
 async function verifyApi() {
-  try {
-    await checkHealth();
-    setStatus("API online", "ok");
-  } catch (error) {
-    setStatus("API offline", "error");
-  }
+  await checkHealth();
+  setStatus(isDemoMode() ? "Modo demonstracao" : "API online", isDemoMode() ? "loading" : "ok");
 }
 
 async function runSearch() {
@@ -62,7 +65,10 @@ async function runSearch() {
   try {
     const providers = await searchProviders(query);
     renderProviderOptions(providers);
-    setStatus(providers.length ? "Busca concluida" : "Nenhum resultado", providers.length ? "ok" : "error");
+    setStatus(
+      providers.length ? (isDemoMode() ? "Modo demonstracao" : "Busca concluida") : "Nenhum resultado",
+      providers.length ? "ok" : "error",
+    );
 
     if (providers[0]) {
       elements.providerSelect.value = String(providers[0].id);
@@ -78,7 +84,7 @@ async function loadDashboard(providerId) {
   try {
     const dashboard = await getProviderDashboard(providerId);
     renderDashboard(dashboard);
-    setStatus("Painel atualizado", "ok");
+    setStatus(isDemoMode() ? "Modo demonstracao" : "Painel atualizado", isDemoMode() ? "loading" : "ok");
   } catch (error) {
     setStatus("Erro ao carregar painel", "error");
   }
@@ -95,19 +101,43 @@ function renderProviderOptions(providers) {
 }
 
 function renderDashboard({ summary, evolution, technologies, municipalities }) {
+  const filteredEvolution = filterEvolution(evolution);
+  const firstValue = Number(filteredEvolution[0]?.subscriptions_count || 0);
+  const lastValue = Number(filteredEvolution.at(-1)?.subscriptions_count || summary.subscriptions_count || 0);
+  const filteredGrowth = firstValue > 0 ? ((lastValue - firstValue) / firstValue) * 100 : 0;
   const fiberShare = Number(summary.fiber_share_percent || 0);
-  const growth = Number(summary.growth_percent || 0);
 
-  elements.metricSubscriptions.textContent = formatInteger.format(summary.subscriptions_count || 0);
+  elements.metricSubscriptions.textContent = formatInteger.format(lastValue);
   elements.metricFiber.textContent = `${formatPercent.format(fiberShare)}%`;
   elements.metricMunicipalities.textContent = formatInteger.format(summary.municipalities_count || 0);
-  elements.metricGrowth.textContent = `${formatPercent.format(growth)}%`;
+  elements.metricGrowth.textContent = `${formatPercent.format(filteredGrowth)}%`;
   elements.providerSubtitle.textContent = `${summary.name} - CNPJ ${summary.cnpj}`;
-  elements.latestPeriod.textContent = formatPeriod(summary.period);
+  elements.latestPeriod.textContent = periodLabel(filteredEvolution);
 
-  renderEvolution(evolution);
+  renderEvolution(filteredEvolution);
   renderTechnologies(technologies);
   renderMunicipalities(municipalities);
+}
+
+function filterEvolution(rows) {
+  const selected = elements.periodFilter.value;
+  if (selected === "latest") {
+    return rows.slice(-1);
+  }
+  if (selected === "last3") {
+    return rows.slice(-3);
+  }
+  return rows;
+}
+
+function periodLabel(rows) {
+  if (!rows.length) {
+    return "-";
+  }
+  if (rows.length === 1) {
+    return formatPeriod(rows[0].period);
+  }
+  return `${formatPeriod(rows[0].period)} a ${formatPeriod(rows.at(-1).period)}`;
 }
 
 function renderEvolution(rows) {
