@@ -168,20 +168,24 @@ Objetivo:
 
 Rodar um fluxo pequeno usando recorte dos CSVs reais, saindo do arquivo e chegando no Supabase.
 
-Entregaveis previstos:
+Entregaveis:
 
-- recorte controlado dos CSVs reais;
-- leitura pelo importador;
-- gravacao pelo writer;
+- recorte controlado do CSV real de 2026;
+- leitura e normalizacao de 5 linhas de origem;
+- gravacao de 24 registros mensais reais;
 - validacao de contagens;
-- medicao inicial de tempo;
-- decisao sobre a estrategia da carga completa.
+- validacao de totais agregados por mes;
+- script `backend/scripts/import_csv_preview.py` para futuras amostras pelo backend.
+
+Status:
+
+Concluida.
 
 ## Sprint 10 - Dashboard inicial
 
 Objetivo:
 
-Criar a primeira versao funcional do dashboard online.
+Criar a primeira versao funcional do dashboard online consultando os dados ja gravados.
 
 Entregaveis previstos:
 
