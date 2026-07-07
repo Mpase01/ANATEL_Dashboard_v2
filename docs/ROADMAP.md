@@ -147,18 +147,37 @@ Concluida.
 
 Objetivo:
 
-Conectar o backend ao banco real via `.env` e gravar uma primeira importacao pequena/controlada.
+Validar uma primeira gravacao pequena no Supabase real, sem importar ainda as planilhas grandes da ANATEL.
+
+Entregaveis:
+
+- confirmacao das tabelas reais no Supabase;
+- criacao de `import_batch` e `import_file` de amostra;
+- gravacao de uma prestadora ficticia e seu alias;
+- gravacao de 2 registros mensais ficticios;
+- validacao de contagens no banco;
+- modulo `backend/app/importer/database_writer.py` para concentrar a escrita no banco.
+
+Status:
+
+Concluida.
+
+## Sprint 9 - Importacao pequena de ponta a ponta
+
+Objetivo:
+
+Rodar um fluxo pequeno usando recorte dos CSVs reais, saindo do arquivo e chegando no Supabase.
 
 Entregaveis previstos:
 
-- `.env` local configurado fora do GitHub;
-- teste de conexao real pelo backend;
-- criacao de `import_batch` e `import_file`;
-- gravacao de provedores e aliases;
-- gravacao de registros normalizados;
-- validacao de contagens no banco.
+- recorte controlado dos CSVs reais;
+- leitura pelo importador;
+- gravacao pelo writer;
+- validacao de contagens;
+- medicao inicial de tempo;
+- decisao sobre a estrategia da carga completa.
 
-## Sprint 9 - Dashboard inicial
+## Sprint 10 - Dashboard inicial
 
 Objetivo:
 
@@ -172,7 +191,7 @@ Entregaveis previstos:
 - tabelas por UF e municipio;
 - composicao por tecnologia.
 
-## Sprint 10 - Otimizacao e experiencia
+## Sprint 11 - Otimizacao e experiencia
 
 Objetivo:
 
