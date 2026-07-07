@@ -275,7 +275,7 @@ Entregaveis previstos:
 
 Status:
 
-Planejada.
+Em andamento. A API real ja roda localmente, mas ainda falta configurar `DATABASE_URL` para conectar ao Supabase.
 
 ## Sprint futura - Mapas
 
