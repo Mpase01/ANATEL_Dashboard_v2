@@ -27,6 +27,7 @@ O objetivo da documentacao e manter o projeto simples de entender, facil de evol
 19. `SPRINT_9.md` - resume a primeira importacao pequena com dados reais da ANATEL.
 20. `SPRINT_10.md` - resume o primeiro dashboard funcional com dados de amostra.
 21. `SPRINT_11.md` - resume a previa local, modo demonstracao e filtro de periodo.
+22. `SPRINT_12.md` - resume a API local de demonstracao para validar o contrato do dashboard.
 
 ## Principio central
 
