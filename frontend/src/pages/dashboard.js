@@ -82,7 +82,7 @@ async function runSearch() {
 async function loadDashboard(providerId) {
   setStatus("Carregando painel...", "loading");
   try {
-    const dashboard = await getProviderDashboard(providerId);
+    const dashboard = await getProviderDashboard(providerId, elements.periodFilter.value);
     renderDashboard(dashboard);
     setStatus(isDemoMode() ? "Modo demonstracao" : "Painel atualizado", isDemoMode() ? "loading" : "ok");
   } catch (error) {
@@ -101,33 +101,20 @@ function renderProviderOptions(providers) {
 }
 
 function renderDashboard({ summary, evolution, technologies, municipalities }) {
-  const filteredEvolution = filterEvolution(evolution);
-  const firstValue = Number(filteredEvolution[0]?.subscriptions_count || 0);
-  const lastValue = Number(filteredEvolution.at(-1)?.subscriptions_count || summary.subscriptions_count || 0);
-  const filteredGrowth = firstValue > 0 ? ((lastValue - firstValue) / firstValue) * 100 : 0;
+  const lastValue = Number(evolution.at(-1)?.subscriptions_count || summary.subscriptions_count || 0);
+  const growth = Number(summary.growth_percent || 0);
   const fiberShare = Number(summary.fiber_share_percent || 0);
 
   elements.metricSubscriptions.textContent = formatInteger.format(lastValue);
   elements.metricFiber.textContent = `${formatPercent.format(fiberShare)}%`;
   elements.metricMunicipalities.textContent = formatInteger.format(summary.municipalities_count || 0);
-  elements.metricGrowth.textContent = `${formatPercent.format(filteredGrowth)}%`;
+  elements.metricGrowth.textContent = `${formatPercent.format(growth)}%`;
   elements.providerSubtitle.textContent = `${summary.name} - CNPJ ${summary.cnpj}`;
-  elements.latestPeriod.textContent = periodLabel(filteredEvolution);
+  elements.latestPeriod.textContent = periodLabel(evolution);
 
-  renderEvolution(filteredEvolution);
+  renderEvolution(evolution);
   renderTechnologies(technologies);
   renderMunicipalities(municipalities);
-}
-
-function filterEvolution(rows) {
-  const selected = elements.periodFilter.value;
-  if (selected === "latest") {
-    return rows.slice(-1);
-  }
-  if (selected === "last3") {
-    return rows.slice(-3);
-  }
-  return rows;
 }
 
 function periodLabel(rows) {
