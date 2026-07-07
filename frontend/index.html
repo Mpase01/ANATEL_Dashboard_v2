@@ -13,7 +13,7 @@
           <p class="eyebrow">ANATEL Dashboard</p>
           <h1>Analise de banda larga fixa</h1>
         </div>
-        <span class="status" id="apiStatus">API nao verificada</span>
+        <span class="status" id="apiStatus">Abrindo painel</span>
       </header>
 
       <section class="toolbar" aria-label="Busca de prestadora">
@@ -23,10 +23,18 @@
         </label>
         <button id="searchButton" type="button">Buscar</button>
         <select id="providerSelect" aria-label="Prestadora encontrada"></select>
+        <label class="search-field">
+          <span>Periodo</span>
+          <select id="periodFilter" aria-label="Recorte temporal">
+            <option value="all">Todos os meses</option>
+            <option value="last3">Ultimos 3 meses</option>
+            <option value="latest">Ultimo mes</option>
+          </select>
+        </label>
       </section>
 
       <p class="notice">
-        Dados atuais de amostra: recorte pequeno do CSV 2026 e uma amostra ficticia de teste.
+        Visualizacao de amostra: recorte pequeno do CSV 2026. A carga completa da ANATEL ainda nao foi feita.
       </p>
 
       <section class="summary-grid" aria-label="Indicadores principais">
