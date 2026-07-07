@@ -49,10 +49,13 @@ def create_app() -> FastAPI:
         ]
 
     @app.get("/providers/{provider_id}/summary")
-    def provider_summary(provider_id: int) -> dict[str, object]:
+    def provider_summary(
+        provider_id: int,
+        period: str = Query(default="all", pattern="^(all|last3|latest)$"),
+    ) -> dict[str, object]:
         try:
             with session_scope() as session:
-                summary = get_provider_summary(session, provider_id=provider_id)
+                summary = get_provider_summary(session, provider_id=provider_id, period=period)
         except RuntimeError as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
 
@@ -61,24 +64,31 @@ def create_app() -> FastAPI:
         return summary
 
     @app.get("/providers/{provider_id}/evolution")
-    def provider_evolution(provider_id: int) -> list[dict[str, object]]:
+    def provider_evolution(
+        provider_id: int,
+        period: str = Query(default="all", pattern="^(all|last3|latest)$"),
+    ) -> list[dict[str, object]]:
         try:
             with session_scope() as session:
-                return get_provider_evolution(session, provider_id=provider_id)
+                return get_provider_evolution(session, provider_id=provider_id, period=period)
         except RuntimeError as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
 
     @app.get("/providers/{provider_id}/technologies")
-    def provider_technologies(provider_id: int) -> list[dict[str, object]]:
+    def provider_technologies(
+        provider_id: int,
+        period: str = Query(default="all", pattern="^(all|last3|latest)$"),
+    ) -> list[dict[str, object]]:
         try:
             with session_scope() as session:
-                return get_provider_technologies(session, provider_id=provider_id)
+                return get_provider_technologies(session, provider_id=provider_id, period=period)
         except RuntimeError as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
 
     @app.get("/providers/{provider_id}/municipalities")
     def provider_municipalities(
         provider_id: int,
+        period: str = Query(default="all", pattern="^(all|last3|latest)$"),
         limit: int = Query(default=20, ge=1, le=100),
     ) -> list[dict[str, object]]:
         try:
@@ -86,6 +96,7 @@ def create_app() -> FastAPI:
                 return get_provider_municipalities(
                     session,
                     provider_id=provider_id,
+                    period=period,
                     limit=limit,
                 )
         except RuntimeError as exc:
