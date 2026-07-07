@@ -43,9 +43,23 @@ national_monthly_totals
 provider_monthly_fiber_totals
 ```
 
+Uma gravacao controlada tambem foi feita com dados ficticios para validar o caminho de escrita.
+
+Contagem apos a amostra:
+
+```text
+providers: 1
+provider_aliases: 1
+import_batches: 1
+import_files: 1
+subscription_records: 2
+```
+
+As planilhas grandes da ANATEL ainda nao foram importadas.
+
 ## O que ainda falta
 
-Ainda falta configurar o backend local com credenciais reais para gravar dados.
+Ainda falta rodar uma importacao pequena com recorte dos CSVs reais antes da carga completa.
 
 Voce nao deve colocar credenciais no GitHub.
 
