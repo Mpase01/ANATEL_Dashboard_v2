@@ -63,9 +63,8 @@ export async function checkHealth() {
 export async function searchProviders(query) {
   if (demoMode) {
     const text = query.trim().toLowerCase();
-    const digits = text.replace(/\D/g, "");
     const matchesName = demoProvider.name.toLowerCase().includes(text);
-    const matchesCnpj = digits ? demoProvider.cnpj.includes(digits) : false;
+    const matchesCnpj = demoProvider.cnpj.includes(text.replace(/\D/g, ""));
     return matchesName || matchesCnpj || text === "" ? [demoProvider] : [];
   }
 
@@ -73,16 +72,17 @@ export async function searchProviders(query) {
   return request(`/providers/search?${params.toString()}`);
 }
 
-export async function getProviderDashboard(providerId) {
+export async function getProviderDashboard(providerId, period = "all") {
   if (demoMode) {
-    return demoDashboard;
+    return buildDemoDashboard(period);
   }
 
+  const params = new URLSearchParams({ period });
   const [summary, evolution, technologies, municipalities] = await Promise.all([
-    request(`/providers/${providerId}/summary`),
-    request(`/providers/${providerId}/evolution`),
-    request(`/providers/${providerId}/technologies`),
-    request(`/providers/${providerId}/municipalities?limit=20`),
+    request(`/providers/${providerId}/summary?${params.toString()}`),
+    request(`/providers/${providerId}/evolution?${params.toString()}`),
+    request(`/providers/${providerId}/technologies?${params.toString()}`),
+    request(`/providers/${providerId}/municipalities?${new URLSearchParams({ period, limit: "20" }).toString()}`),
   ]);
 
   return { summary, evolution, technologies, municipalities };
@@ -90,4 +90,31 @@ export async function getProviderDashboard(providerId) {
 
 export function isDemoMode() {
   return demoMode;
+}
+
+function buildDemoDashboard(period) {
+  const evolution = filterEvolution(demoDashboard.evolution, period);
+  const firstValue = Number(evolution[0]?.subscriptions_count || 0);
+  const lastValue = Number(evolution.at(-1)?.subscriptions_count || 0);
+  const growth = firstValue > 0 ? ((lastValue - firstValue) / firstValue) * 100 : 0;
+  return {
+    ...demoDashboard,
+    summary: {
+      ...demoDashboard.summary,
+      period: evolution.at(-1)?.period || demoDashboard.summary.period,
+      subscriptions_count: lastValue || demoDashboard.summary.subscriptions_count,
+      growth_percent: growth,
+    },
+    evolution,
+  };
+}
+
+function filterEvolution(rows, period) {
+  if (period === "latest") {
+    return rows.slice(-1);
+  }
+  if (period === "last3") {
+    return rows.slice(-3);
+  }
+  return rows;
 }
