@@ -51,18 +51,20 @@ Concluida.
 
 Objetivo:
 
-Criar o modelo inicial do PostgreSQL.
+Criar o modelo inicial do PostgreSQL com base nos CSVs reais da ANATEL.
 
-Entregaveis previstos:
+Entregaveis:
 
+- analise estrutural dos arquivos 2025 e 2026;
 - tabelas principais;
 - indices iniciais;
 - constraints importantes;
-- registro de lotes de importacao.
+- registro de lotes de importacao;
+- schema SQL inicial em `database/schema.sql`.
 
-Observacao:
+Status:
 
-Antes desta sprint, o ideal e analisar uma planilha real da ANATEL para confirmar a estrutura dos dados.
+Concluida.
 
 ## Sprint 4 - Importador inicial
 
@@ -72,11 +74,13 @@ Ler planilhas da ANATEL, identificar meses automaticamente e transformar os dado
 
 Entregaveis previstos:
 
-- leitura de Excel;
+- leitura de CSV separado por `;`;
 - deteccao de colunas `YYYY-MM`;
 - transformacao para linhas;
+- descarte de registros mensais com zero assinantes;
+- calculo de `source_row_hash`;
 - validacoes iniciais;
-- gravacao no banco.
+- preparacao para gravacao no banco.
 
 ## Sprint 5 - API inicial
 
