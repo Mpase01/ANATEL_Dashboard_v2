@@ -72,7 +72,7 @@ Objetivo:
 
 Ler planilhas da ANATEL, identificar meses automaticamente e transformar os dados em formato normalizado.
 
-Entregaveis previstos:
+Entregaveis:
 
 - leitura de CSV separado por `;`;
 - deteccao de colunas `YYYY-MM`;
@@ -80,20 +80,24 @@ Entregaveis previstos:
 - descarte de registros mensais com zero assinantes;
 - calculo de `source_row_hash`;
 - validacoes iniciais;
-- preparacao para gravacao no banco.
+- testes com fixtures pequenas.
 
-## Sprint 5 - API inicial
+Status:
+
+Concluida.
+
+## Sprint 5 - Persistencia e API inicial
 
 Objetivo:
 
-Disponibilizar endpoints para busca de provedores e indicadores principais.
+Preparar a gravacao dos dados importados e iniciar os endpoints principais.
 
 Entregaveis previstos:
 
-- busca por nome e CNPJ;
-- resumo do provedor;
-- evolucao mensal;
-- distribuicao por UF e municipio.
+- criacao de lotes de importacao em codigo;
+- preparacao para gravar `providers`, `provider_aliases`, `import_batches`, `import_files` e `subscription_records`;
+- primeiros endpoints de saude e busca;
+- orientacao para conectar Supabase.
 
 ## Sprint 6 - Dashboard inicial
 
