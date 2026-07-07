@@ -13,13 +13,15 @@ O objetivo da documentacao e manter o projeto simples de entender, facil de evol
 5. `IMPORTER.md` - descreve como as planilhas da ANATEL serao processadas.
 6. `API.md` - descreve a API entre o backend e o dashboard.
 7. `DASHBOARD.md` - descreve a experiencia visual e os indicadores.
-8. `ROADMAP.md` - organiza o projeto por fases e sprints.
-9. `DECISIONS.md` - registra decisoes tecnicas importantes.
-10. `SPRINT_1.md` - resume a primeira sprint de documentacao.
-11. `SPRINT_2.md` - resume a estrutura inicial do projeto.
-12. `SPRINT_3.md` - resume o modelo inicial do banco baseado nos CSVs reais.
-13. `SPRINT_4.md` - resume o importador inicial dos CSVs da ANATEL.
-14. `SPRINT_5.md` - resume a preparacao de persistencia e API inicial.
+8. `SUPABASE_SETUP.md` - explica como o Supabase sera configurado.
+9. `ROADMAP.md` - organiza o projeto por fases e sprints.
+10. `DECISIONS.md` - registra decisoes tecnicas importantes.
+11. `SPRINT_1.md` - resume a primeira sprint de documentacao.
+12. `SPRINT_2.md` - resume a estrutura inicial do projeto.
+13. `SPRINT_3.md` - resume o modelo inicial do banco baseado nos CSVs reais.
+14. `SPRINT_4.md` - resume o importador inicial dos CSVs da ANATEL.
+15. `SPRINT_5.md` - resume a preparacao de persistencia e API inicial.
+16. `SPRINT_6.md` - resume a preparacao de conexao com banco e busca inicial.
 
 ## Principio central
 
