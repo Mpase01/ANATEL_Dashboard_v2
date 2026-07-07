@@ -25,6 +25,7 @@ O objetivo da documentacao e manter o projeto simples de entender, facil de evol
 17. `SPRINT_7.md` - resume a aplicacao do schema no Supabase real.
 18. `SPRINT_8.md` - resume a primeira gravacao controlada no Supabase real.
 19. `SPRINT_9.md` - resume a primeira importacao pequena com dados reais da ANATEL.
+20. `SPRINT_10.md` - resume o primeiro dashboard funcional com dados de amostra.
 
 ## Principio central
 
