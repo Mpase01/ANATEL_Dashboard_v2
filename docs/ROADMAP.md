@@ -205,15 +205,34 @@ Concluida.
 
 Objetivo:
 
-Rodar backend e frontend juntos, corrigir detalhes de experiencia e preparar a proxima etapa de carga maior.
+Rodar a tela localmente, permitir visualizacao mesmo sem API local configurada e adicionar primeiro controle de recorte temporal.
+
+Entregaveis:
+
+- previa local em `http://127.0.0.1:5173/`;
+- modo demonstracao no frontend;
+- filtro de periodo;
+- recalculo de crescimento conforme recorte escolhido;
+- validacao visual no navegador local;
+- documentacao da sprint.
+
+Status:
+
+Concluida.
+
+## Sprint 12 - API real local e filtros no backend
+
+Objetivo:
+
+Ligar a tela local ao backend real e preparar filtros de periodo calculados pela API.
 
 Entregaveis previstos:
 
-- verificacao local da tela no navegador;
-- ajustes visuais finos;
-- mensagens de erro melhores;
-- planejamento da importacao completa;
-- primeiros cuidados de performance para base grande.
+- backend local rodando com conexao real;
+- tela consumindo endpoints reais;
+- parametros de periodo nos endpoints;
+- mensagens melhores para erro de API;
+- preparacao para importacao completa com progresso.
 
 ## Sprint futura - Mapas
 
