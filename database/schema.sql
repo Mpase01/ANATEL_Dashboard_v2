@@ -1,6 +1,6 @@
 -- ANATEL Dashboard - initial PostgreSQL schema
 -- This schema is based on the real ANATEL CSV structure analyzed in July 2026.
--- It is not applied automatically. Review before running in Supabase.
+-- It is designed for PostgreSQL/Supabase and keeps direct database access in the backend.
 
 create table if not exists providers (
     id bigserial primary key,
@@ -111,8 +111,24 @@ create index if not exists idx_subscription_records_provider_state_period
 create index if not exists idx_subscription_records_provider_municipality_period
     on subscription_records (provider_id, municipality_code, period);
 
+-- Keep public Data API roles from accessing internal tables directly.
+revoke all on table providers from anon, authenticated;
+revoke all on table provider_aliases from anon, authenticated;
+revoke all on table import_batches from anon, authenticated;
+revoke all on table import_files from anon, authenticated;
+revoke all on table subscription_records from anon, authenticated;
+
+revoke all on all sequences in schema public from anon, authenticated;
+
+alter table providers enable row level security;
+alter table provider_aliases enable row level security;
+alter table import_batches enable row level security;
+alter table import_files enable row level security;
+alter table subscription_records enable row level security;
+
 -- Useful view for dashboard queries by provider and month.
-create or replace view provider_monthly_totals as
+create or replace view provider_monthly_totals
+with (security_invoker = true) as
 select
     provider_id,
     period,
@@ -121,7 +137,8 @@ from subscription_records
 group by provider_id, period;
 
 -- Useful view for national monthly totals and market share calculations.
-create or replace view national_monthly_totals as
+create or replace view national_monthly_totals
+with (security_invoker = true) as
 select
     period,
     sum(subscriptions_count) as subscriptions_count
@@ -129,7 +146,8 @@ from subscription_records
 group by period;
 
 -- Useful view for fiber participation by provider and month.
-create or replace view provider_monthly_fiber_totals as
+create or replace view provider_monthly_fiber_totals
+with (security_invoker = true) as
 select
     provider_id,
     period,
@@ -138,3 +156,7 @@ from subscription_records
 where lower(coalesce(access_medium, '')) = 'fibra'
    or upper(coalesce(technology, '')) in ('FTTH', 'FTTB')
 group by provider_id, period;
+
+revoke all on table provider_monthly_totals from anon, authenticated;
+revoke all on table national_monthly_totals from anon, authenticated;
+revoke all on table provider_monthly_fiber_totals from anon, authenticated;
