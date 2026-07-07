@@ -23,6 +23,7 @@ O objetivo da documentacao e manter o projeto simples de entender, facil de evol
 15. `SPRINT_5.md` - resume a preparacao de persistencia e API inicial.
 16. `SPRINT_6.md` - resume a preparacao de conexao com banco e busca inicial.
 17. `SPRINT_7.md` - resume a aplicacao do schema no Supabase real.
+18. `SPRINT_8.md` - resume a primeira gravacao controlada no Supabase real.
 
 ## Principio central
 
