@@ -27,6 +27,18 @@ Toda consulta deve passar pela API.
 - Regras de calculo centralizadas no backend.
 - Contratos de resposta documentados.
 
+## Parametro de periodo
+
+Os endpoints do dashboard aceitam o parametro opcional `period`.
+
+Valores aceitos:
+
+- `all` - todos os meses disponiveis para o provedor.
+- `last3` - os 3 meses mais recentes disponiveis.
+- `latest` - somente o mes mais recente disponivel.
+
+Quando o parametro nao for informado, a API deve usar `all`.
+
 ## Endpoints planejados
 
 ### Saude da API
@@ -48,7 +60,7 @@ Permite buscar provedores por nome ou CNPJ.
 ### Resumo do provedor
 
 ```text
-GET /providers/{provider_id}/summary
+GET /providers/{provider_id}/summary?period=all|last3|latest
 ```
 
 Retorna os principais indicadores do provedor selecionado.
@@ -62,20 +74,20 @@ Indicadores previstos:
 - numero de estados;
 - principal municipio;
 - principal estado;
-- crescimento nos ultimos 12 meses.
+- crescimento dentro do periodo selecionado.
 
 ### Evolucao mensal
 
 ```text
-GET /providers/{provider_id}/evolution
+GET /providers/{provider_id}/evolution?period=all|last3|latest
 ```
 
-Retorna a serie mensal de assinantes, por tecnologia quando necessario.
+Retorna a serie mensal de assinantes no periodo selecionado.
 
 ### Distribuicao por estado
 
 ```text
-GET /providers/{provider_id}/states
+GET /providers/{provider_id}/states?period=all|last3|latest
 ```
 
 Retorna assinantes e participacao por UF.
@@ -83,18 +95,18 @@ Retorna assinantes e participacao por UF.
 ### Distribuicao por municipio
 
 ```text
-GET /providers/{provider_id}/municipalities
+GET /providers/{provider_id}/municipalities?period=all|last3|latest&limit=20
 ```
 
-Retorna assinantes por municipio.
+Retorna assinantes por municipio no mes mais recente do periodo selecionado.
 
 ### Tecnologias
 
 ```text
-GET /providers/{provider_id}/technologies
+GET /providers/{provider_id}/technologies?period=all|last3|latest
 ```
 
-Retorna a composicao por tecnologia, com destaque para fibra.
+Retorna a composicao por tecnologia no mes mais recente do periodo selecionado, com destaque para fibra.
 
 ### Importacao
 
