@@ -43,23 +43,37 @@ national_monthly_totals
 provider_monthly_fiber_totals
 ```
 
-Uma gravacao controlada tambem foi feita com dados ficticios para validar o caminho de escrita.
+Foram feitas duas gravacoes pequenas:
 
-Contagem apos a amostra:
+1. Sprint 8: amostra ficticia para validar escrita.
+2. Sprint 9: recorte real do CSV de 2026.
+
+Contagem atual, incluindo as duas amostras:
 
 ```text
-providers: 1
-provider_aliases: 1
-import_batches: 1
-import_files: 1
-subscription_records: 2
+providers: 2
+provider_aliases: 2
+import_batches: 2
+import_files: 2
+subscription_records: 26
 ```
 
-As planilhas grandes da ANATEL ainda nao foram importadas.
+Recorte real gravado na Sprint 9:
+
+```text
+arquivo: Acessos_Banda_Larga_Fixa_2026_Colunas.csv
+linhas de origem: 5
+registros mensais: 24
+total de acessos: 455
+prestadora: NET-UAI INTERNET WIRELESS
+cnpj: 10785849000171
+```
+
+As planilhas grandes da ANATEL ainda nao foram importadas por completo.
 
 ## O que ainda falta
 
-Ainda falta rodar uma importacao pequena com recorte dos CSVs reais antes da carga completa.
+Ainda falta preparar o dashboard inicial e, depois, planejar a carga completa com seguranca.
 
 Voce nao deve colocar credenciais no GitHub.
 
