@@ -123,22 +123,42 @@ Status:
 
 Concluida.
 
-## Sprint 7 - Supabase real e gravacao inicial
+## Sprint 7 - Supabase real e schema aplicado
 
 Objetivo:
 
-Conectar um projeto Supabase real, aplicar o schema em ambiente vazio ou de teste e gravar uma primeira importacao controlada.
+Conectar um projeto Supabase real e aplicar o schema inicial em banco vazio.
+
+Entregaveis:
+
+- projeto Supabase identificado;
+- schema aplicado via migration;
+- RLS habilitado;
+- views criadas com `security_invoker`;
+- indices de chaves estrangeiras adicionados;
+- advisors de seguranca e performance revisados;
+- guia Supabase atualizado.
+
+Status:
+
+Concluida.
+
+## Sprint 8 - Gravacao controlada no banco
+
+Objetivo:
+
+Conectar o backend ao banco real via `.env` e gravar uma primeira importacao pequena/controlada.
 
 Entregaveis previstos:
 
-- projeto Supabase conectado;
-- `.env` local configurado;
-- schema aplicado;
-- teste de conexao real;
+- `.env` local configurado fora do GitHub;
+- teste de conexao real pelo backend;
+- criacao de `import_batch` e `import_file`;
 - gravacao de provedores e aliases;
-- gravacao inicial de registros normalizados.
+- gravacao de registros normalizados;
+- validacao de contagens no banco.
 
-## Sprint 8 - Dashboard inicial
+## Sprint 9 - Dashboard inicial
 
 Objetivo:
 
@@ -152,7 +172,7 @@ Entregaveis previstos:
 - tabelas por UF e municipio;
 - composicao por tecnologia.
 
-## Sprint 9 - Otimizacao e experiencia
+## Sprint 10 - Otimizacao e experiencia
 
 Objetivo:
 
