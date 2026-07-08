@@ -14,22 +14,23 @@ O objetivo da documentacao e manter o projeto simples de entender, facil de evol
 6. `API.md` - descreve a API entre o backend e o dashboard.
 7. `DASHBOARD.md` - descreve a experiencia visual e os indicadores.
 8. `SUPABASE_SETUP.md` - explica como o Supabase sera configurado.
-9. `ROADMAP.md` - organiza o projeto por fases e sprints.
-10. `DECISIONS.md` - registra decisoes tecnicas importantes.
-11. `SPRINT_1.md` - resume a primeira sprint de documentacao.
-12. `SPRINT_2.md` - resume a estrutura inicial do projeto.
-13. `SPRINT_3.md` - resume o modelo inicial do banco baseado nos CSVs reais.
-14. `SPRINT_4.md` - resume o importador inicial dos CSVs da ANATEL.
-15. `SPRINT_5.md` - resume a preparacao de persistencia e API inicial.
-16. `SPRINT_6.md` - resume a preparacao de conexao com banco e busca inicial.
-17. `SPRINT_7.md` - resume a aplicacao do schema no Supabase real.
-18. `SPRINT_8.md` - resume a primeira gravacao controlada no Supabase real.
-19. `SPRINT_9.md` - resume a primeira importacao pequena com dados reais da ANATEL.
-20. `SPRINT_10.md` - resume o primeiro dashboard funcional com dados de amostra.
-21. `SPRINT_11.md` - resume a previa local, modo demonstracao e filtro de periodo.
-22. `SPRINT_12.md` - resume a API local de demonstracao para validar o contrato do dashboard.
-23. `SPRINT_13.md` - resume o filtro temporal no contrato da API.
-24. `SPRINT_14.md` - resume a preparacao local do backend real.
+9. `SUPABASE_CONNECTION.md` - explica como conectar a API local ao Supabase com seguranca.
+10. `ROADMAP.md` - organiza o projeto por fases e sprints.
+11. `DECISIONS.md` - registra decisoes tecnicas importantes.
+12. `SPRINT_1.md` - resume a primeira sprint de documentacao.
+13. `SPRINT_2.md` - resume a estrutura inicial do projeto.
+14. `SPRINT_3.md` - resume o modelo inicial do banco baseado nos CSVs reais.
+15. `SPRINT_4.md` - resume o importador inicial dos CSVs da ANATEL.
+16. `SPRINT_5.md` - resume a preparacao de persistencia e API inicial.
+17. `SPRINT_6.md` - resume a preparacao de conexao com banco e busca inicial.
+18. `SPRINT_7.md` - resume a aplicacao do schema no Supabase real.
+19. `SPRINT_8.md` - resume a primeira gravacao controlada no Supabase real.
+20. `SPRINT_9.md` - resume a primeira importacao pequena com dados reais da ANATEL.
+21. `SPRINT_10.md` - resume o primeiro dashboard funcional com dados de amostra.
+22. `SPRINT_11.md` - resume a previa local, modo demonstracao e filtro de periodo.
+23. `SPRINT_12.md` - resume a API local de demonstracao para validar o contrato do dashboard.
+24. `SPRINT_13.md` - resume o filtro temporal no contrato da API.
+25. `SPRINT_14.md` - resume a preparacao local do backend real.
 
 ## Principio central
 
