@@ -10,7 +10,10 @@ Preparar o backend real para rodar localmente com FastAPI, como passo anterior a
 - A API real subiu localmente em `http://127.0.0.1:8001`.
 - O endpoint `GET /health` respondeu com sucesso.
 - Foi criado o script `backend/scripts/run_api_local.py` para facilitar a execucao local da API real.
+- Foi criado o script `backend/scripts/check_database.py` para verificar a conexao com o banco.
+- O backend passou a carregar `.env` automaticamente quando o arquivo existir.
 - O `.gitignore` foi atualizado para ignorar dependencias e temporarios locais.
+- Foi criado o guia `docs/SUPABASE_CONNECTION.md` para configurar a conexao local com seguranca.
 
 ## Validacao feita
 
@@ -28,6 +31,12 @@ Resposta observada:
 {"detail":"DATABASE_URL is not configured."}
 ```
 
+O verificador local tambem retorna uma mensagem simples quando a configuracao ainda falta:
+
+```text
+Configuracao pendente: DATABASE_URL is not configured.
+```
+
 ## Ponto importante
 
 A API real ja roda, mas ainda nao esta conectada ao Supabase localmente.
@@ -43,6 +52,7 @@ Em andamento.
 Configurar `DATABASE_URL` localmente e testar:
 
 ```text
+python backend/scripts/check_database.py
 GET /providers/search?query=NET
 GET /providers/{provider_id}/summary?period=all
 GET /providers/{provider_id}/evolution?period=all
