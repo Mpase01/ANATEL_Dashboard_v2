@@ -268,6 +268,8 @@ Entregaveis previstos:
 
 - dependencias do backend instaladas ou preparadas;
 - FastAPI real rodando localmente;
+- carregamento local de `.env`;
+- verificador de conexao com banco;
 - `DATABASE_URL` local configurado com seguranca;
 - tela consumindo endpoints reais;
 - mensagens melhores para erro de API;
@@ -275,7 +277,7 @@ Entregaveis previstos:
 
 Status:
 
-Em andamento. A API real ja roda localmente, mas ainda falta configurar `DATABASE_URL` para conectar ao Supabase.
+Em andamento. A API real ja roda localmente e o verificador de banco ja existe, mas ainda falta configurar `DATABASE_URL` para conectar ao Supabase.
 
 ## Sprint futura - Mapas
 
