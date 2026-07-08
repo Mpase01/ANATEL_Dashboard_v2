@@ -4,6 +4,18 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from pathlib import Path
+
+
+def load_local_env() -> None:
+    try:
+        from dotenv import load_dotenv
+    except ModuleNotFoundError:
+        return
+
+    root_dir = Path(__file__).resolve().parents[3]
+    load_dotenv(root_dir / ".env", override=False)
+    load_dotenv(root_dir / "backend" / ".env", override=False)
 
 
 @dataclass(frozen=True)
@@ -17,6 +29,7 @@ class Settings:
 
 
 def get_settings() -> Settings:
+    load_local_env()
     return Settings(
         backend_host=os.getenv("BACKEND_HOST", "0.0.0.0"),
         backend_port=parse_int(os.getenv("BACKEND_PORT"), default=8000),
