@@ -286,13 +286,33 @@ Objetivo:
 
 Importar um volume maior dos CSVs reais com seguranca, medindo tempo, volume e impacto antes da carga completa.
 
-Entregaveis previstos:
+Entregaveis:
 
 - estrategia de importacao por lotes;
 - medicao de tempo por lote;
 - validacao de contagens depois da importacao;
 - protecao contra duplicidade;
-- preparacao para barra de progresso.
+- importacao real de 5.000 registros normalizados no Supabase;
+- identificacao do gargalo de desempenho antes da carga completa.
+
+Status:
+
+Concluida.
+
+## Sprint 16 - Otimizacao da importacao
+
+Objetivo:
+
+Otimizar a escrita dos dados no Supabase antes de importar o arquivo completo da ANATEL.
+
+Entregaveis previstos:
+
+- reduzir gravacoes individuais no banco;
+- preparar gravacao em massa;
+- manter controle de duplicidade;
+- manter registro de lote e arquivo;
+- medir novamente tempo por volume importado;
+- deixar o caminho pronto para carga completa.
 
 Status:
 
