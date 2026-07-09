@@ -72,7 +72,12 @@ def create_app() -> FastAPI:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
 
         return [
-            {"id": result.id, "cnpj": result.cnpj, "name": result.name}
+            {
+                "id": result.id,
+                "cnpj": result.cnpj,
+                "name": result.name,
+                "latest_subscriptions_count": result.latest_subscriptions_count,
+            }
             for result in results
         ]
 
