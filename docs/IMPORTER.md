@@ -123,24 +123,55 @@ Pessoa Fisica  -> B2C
 Pessoa Juridica -> B2B
 ```
 
-## Implementacao agregada preparada
+## Implementacao agregada
 
-A Sprint 20 preparou os arquivos para gravar a base compactada:
+Arquivos principais:
 
 ```text
 backend/app/importer/aggregation.py
 database/aggregated_schema.sql
 backend/scripts/import_csv_aggregated.py
+backend/scripts/manage_aggregated_database.py
+backend/scripts/validate_aggregated_api.py
 backend/tests/test_importer_aggregation.py
 ```
 
-A tabela planejada se chama:
+A tabela se chama:
 
 ```text
 aggregated_subscription_records
 ```
 
 Ela usa uma chave de atualizacao composta por periodo, prestadora, nome da prestadora, municipio, UF, tecnologia, meio de acesso e tipo de pessoa. Isso evita duplicidade e permite atualizar valores quando uma planilha mensal corrigida for enviada.
+
+## Carga agregada real de 2026
+
+A Sprint 21 executou a carga real agregada no Supabase.
+
+Resultado:
+
+```text
+base bruta: 3.222.220 registros
+base compactada: 839.183 registros
+reducao: 73,96%
+tempo de importacao: 251,33 segundos
+```
+
+A soma de assinantes foi preservada:
+
+```text
+base bruta: 280.681.407
+base compactada: 280.681.407
+```
+
+Estado validado no banco:
+
+```text
+providers: 11.456
+subscription_records: 0
+aggregated_subscription_records: 839.183
+aggregated_subscriptions_sum: 280.681.407
+```
 
 ## Simulacao de compactacao
 
