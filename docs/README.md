@@ -33,6 +33,7 @@ O objetivo da documentacao e manter o projeto simples de entender, facil de evol
 25. `SPRINT_14.md` - resume a preparacao local do backend real.
 26. `SPRINT_15.md` - resume a importacao ampliada por lotes com dados reais.
 27. `SPRINT_16.md` - resume a otimizacao da gravacao em lote no Supabase.
+28. `SPRINT_17.md` - resume o teste ampliado com 50.000 registros normalizados.
 
 ## Principio central
 
