@@ -305,14 +305,32 @@ Objetivo:
 
 Otimizar a escrita dos dados no Supabase antes de importar o arquivo completo da ANATEL.
 
+Entregaveis:
+
+- reducao de gravacoes individuais no banco;
+- gravacao em massa para prestadoras, aliases e registros mensais;
+- manutencao do controle de duplicidade;
+- manutencao do registro de lote e arquivo;
+- reducao do teste de 5.000 registros de 107,86 para 3,77 segundos;
+- validacao de que a reimportacao nao duplicou registros.
+
+Status:
+
+Concluida.
+
+## Sprint 17 - Teste com volume maior
+
+Objetivo:
+
+Testar a importacao otimizada com um volume maior antes da carga completa.
+
 Entregaveis previstos:
 
-- reduzir gravacoes individuais no banco;
-- preparar gravacao em massa;
-- manter controle de duplicidade;
-- manter registro de lote e arquivo;
-- medir novamente tempo por volume importado;
-- deixar o caminho pronto para carga completa.
+- importar 50.000 registros normalizados do CSV real;
+- medir tempo total;
+- validar contagens no banco;
+- verificar resposta do dashboard com base maior;
+- decidir se a carga completa ja pode ser executada.
 
 Status:
 
