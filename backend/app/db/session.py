@@ -13,12 +13,14 @@ from typing import Any
 from app.core.config import Settings, get_settings
 
 try:
-    from sqlalchemy import create_engine
+    from sqlalchemy import create_engine, text
     from sqlalchemy.orm import Session, sessionmaker
+    from sqlalchemy.pool import NullPool
 except ModuleNotFoundError:  # pragma: no cover - exercised only before deps install.
     create_engine = None
     Session = Any
     sessionmaker = None
+    NullPool = None
 
 
 def create_session_factory(settings: Settings | None = None):
@@ -28,7 +30,12 @@ def create_session_factory(settings: Settings | None = None):
     if create_engine is None or sessionmaker is None:
         raise RuntimeError("SQLAlchemy is not installed.")
 
-    engine = create_engine(settings.database_url, pool_pre_ping=True)
+    engine = create_engine(
+        settings.database_url,
+        pool_pre_ping=True,
+        poolclass=NullPool,
+        connect_args={"target_session_attrs": "read-write"},
+    )
     return sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
@@ -37,6 +44,7 @@ def session_scope(settings: Settings | None = None) -> Iterator[Session]:
     session_factory = create_session_factory(settings)
     session = session_factory()
     try:
+        session.execute(text("set transaction read write"))
         yield session
     finally:
         session.close()
