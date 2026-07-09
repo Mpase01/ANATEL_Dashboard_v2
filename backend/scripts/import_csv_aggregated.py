@@ -20,7 +20,7 @@ for path in (LOCAL_DEPS_DIR, BACKEND_DIR):
 
 from app.db.session import session_scope
 from app.importer.aggregation import (
-    aggregate_subscription_records,
+    aggregate_subscription_records_with_stats,
     build_aggregated_subscription_rows,
 )
 from app.importer.anatel_csv import inspect_csv, iter_subscription_records
@@ -54,17 +54,18 @@ def limited_records(path: Path, limit: int | None):
 def run_import(csv_path: Path, *, limit: int | None, batch_size: int, dry_run: bool) -> dict[str, object]:
     metadata = inspect_csv(csv_path)
     started_at = time.monotonic()
-    raw_records = list(limited_records(csv_path, limit))
-    aggregated_records = aggregate_subscription_records(raw_records)
-    raw_total = sum(record.subscriptions_count for record in raw_records)
+    aggregation = aggregate_subscription_records_with_stats(limited_records(csv_path, limit))
+    aggregated_records = aggregation.records
+    raw_records_count = aggregation.raw_records_count
+    raw_total = aggregation.subscriptions_sum
     aggregated_total = sum(record.subscriptions_count for record in aggregated_records)
 
     if dry_run:
         return {
             "dry_run": True,
-            "raw_records": len(raw_records),
+            "raw_records": raw_records_count,
             "aggregated_records": len(aggregated_records),
-            "reduction_percent": calculate_reduction(len(raw_records), len(aggregated_records)),
+            "reduction_percent": calculate_reduction(raw_records_count, len(aggregated_records)),
             "raw_subscriptions_sum": raw_total,
             "aggregated_subscriptions_sum": aggregated_total,
             "elapsed_seconds": round(time.monotonic() - started_at, 2),
@@ -116,7 +117,7 @@ def run_import(csv_path: Path, *, limit: int | None, batch_size: int, dry_run: b
             writer = ImportDatabaseWriter(session)
             writer.finish_batch(
                 import_batch_id=import_batch_id,
-                rows_read=len(raw_records),
+                rows_read=raw_records_count,
                 rows_inserted=total_written,
                 rows_updated=0,
                 rows_skipped=0,
@@ -127,7 +128,7 @@ def run_import(csv_path: Path, *, limit: int | None, batch_size: int, dry_run: b
             writer = ImportDatabaseWriter(session)
             writer.finish_batch(
                 import_batch_id=import_batch_id,
-                rows_read=len(raw_records),
+                rows_read=raw_records_count,
                 rows_inserted=total_written,
                 rows_updated=0,
                 rows_skipped=0,
@@ -141,11 +142,11 @@ def run_import(csv_path: Path, *, limit: int | None, batch_size: int, dry_run: b
         "dry_run": False,
         "import_batch_id": import_batch_id,
         "import_file_id": import_file_id,
-        "raw_records": len(raw_records),
+        "raw_records": raw_records_count,
         "aggregated_records": len(aggregated_records),
         "written_records": total_written,
         "batches": batch_count,
-        "reduction_percent": calculate_reduction(len(raw_records), len(aggregated_records)),
+        "reduction_percent": calculate_reduction(raw_records_count, len(aggregated_records)),
         "raw_subscriptions_sum": raw_total,
         "aggregated_subscriptions_sum": aggregated_total,
         "elapsed_seconds": round(time.monotonic() - started_at, 2),
