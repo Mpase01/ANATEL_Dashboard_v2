@@ -112,10 +112,12 @@ def run_import(csv_path: Path, *, limit: int | None, batch_size: int, dry_run: b
         )
         session.commit()
 
-        try:
-            for batch in chunks(limited_records(csv_path, limit), batch_size):
-                batch_count += 1
-                total_read += len(batch)
+    try:
+        for batch in chunks(limited_records(csv_path, limit), batch_size):
+            batch_count += 1
+            total_read += len(batch)
+            with session_scope() as session:
+                writer = ImportDatabaseWriter(session)
                 written = import_batch(
                     writer=writer,
                     records=batch,
@@ -129,6 +131,8 @@ def run_import(csv_path: Path, *, limit: int | None, batch_size: int, dry_run: b
                     f"written_records={written} total_written={total_written}"
                 )
 
+        with session_scope() as session:
+            writer = ImportDatabaseWriter(session)
             writer.finish_batch(
                 import_batch_id=import_batch_id,
                 rows_read=total_read,
@@ -137,8 +141,9 @@ def run_import(csv_path: Path, *, limit: int | None, batch_size: int, dry_run: b
                 rows_skipped=0,
             )
             session.commit()
-        except Exception as exc:
-            session.rollback()
+    except Exception as exc:
+        with session_scope() as session:
+            writer = ImportDatabaseWriter(session)
             writer.finish_batch(
                 import_batch_id=import_batch_id,
                 rows_read=total_read,
@@ -149,7 +154,7 @@ def run_import(csv_path: Path, *, limit: int | None, batch_size: int, dry_run: b
                 error_message=str(exc)[:1000],
             )
             session.commit()
-            raise
+        raise
 
     return {
         "dry_run": False,
