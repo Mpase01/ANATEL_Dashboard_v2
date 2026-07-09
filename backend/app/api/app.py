@@ -11,6 +11,7 @@ from app.db.session import session_scope
 from app.repositories.dashboard import (
     get_provider_evolution,
     get_provider_municipalities,
+    get_provider_person_types,
     get_provider_summary,
     get_provider_technologies,
 )
@@ -42,7 +43,8 @@ def create_app() -> FastAPI:
                         """
                         select
                             (select count(*) from public.providers) as providers_count,
-                            (select count(*) from public.subscription_records) as records_count
+                            (select count(*) from public.aggregated_subscription_records) as records_count,
+                            (select coalesce(sum(subscriptions_count), 0) from public.aggregated_subscription_records) as subscriptions_sum
                         """
                     )
                 ).mappings().one()
@@ -55,6 +57,7 @@ def create_app() -> FastAPI:
             "status": "ok",
             "providers_count": result["providers_count"],
             "records_count": result["records_count"],
+            "subscriptions_sum": result["subscriptions_sum"],
         }
 
     @app.get("/providers/search")
@@ -107,6 +110,17 @@ def create_app() -> FastAPI:
         try:
             with session_scope() as session:
                 return get_provider_technologies(session, provider_id=provider_id, period=period)
+        except RuntimeError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    @app.get("/providers/{provider_id}/person-types")
+    def provider_person_types(
+        provider_id: int,
+        period: str = Query(default="all", pattern="^(all|last3|latest)$"),
+    ) -> list[dict[str, object]]:
+        try:
+            with session_scope() as session:
+                return get_provider_person_types(session, provider_id=provider_id, period=period)
         except RuntimeError as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
 
