@@ -20,6 +20,7 @@ const elements = {
   latestPeriod: document.querySelector("#latestPeriod"),
   evolutionChart: document.querySelector("#evolutionChart"),
   technologyList: document.querySelector("#technologyList"),
+  personTypeList: document.querySelector("#personTypeList"),
   municipalityRows: document.querySelector("#municipalityRows"),
 };
 
@@ -100,7 +101,7 @@ function renderProviderOptions(providers) {
   }
 }
 
-function renderDashboard({ summary, evolution, technologies, municipalities }) {
+function renderDashboard({ summary, evolution, technologies, personTypes = [], municipalities }) {
   const lastValue = Number(evolution.at(-1)?.subscriptions_count || summary.subscriptions_count || 0);
   const growth = Number(summary.growth_percent || 0);
   const fiberShare = Number(summary.fiber_share_percent || 0);
@@ -114,6 +115,7 @@ function renderDashboard({ summary, evolution, technologies, municipalities }) {
 
   renderEvolution(evolution);
   renderTechnologies(technologies);
+  renderPersonTypes(personTypes);
   renderMunicipalities(municipalities);
 }
 
@@ -165,6 +167,27 @@ function renderTechnologies(rows) {
   }
 }
 
+function renderPersonTypes(rows) {
+  elements.personTypeList.innerHTML = "";
+  for (const row of rows) {
+    const item = document.createElement("div");
+    const label = String(row.person_type || "-");
+    const isBusiness = label.toLowerCase().includes("juridica");
+    item.className = `stack-item${isBusiness ? " stack-item-featured" : ""}`;
+    item.innerHTML = `
+      <div>
+        <strong>${personTypeLabel(label)}</strong>
+        <span>${isBusiness ? "B2B" : "B2C"}</span>
+      </div>
+      <div class="stack-numbers">
+        <strong>${formatInteger.format(row.subscriptions_count || 0)}</strong>
+        <span>${formatPercent.format(Number(row.share_percent || 0))}%</span>
+      </div>
+    `;
+    elements.personTypeList.append(item);
+  }
+}
+
 function renderMunicipalities(rows) {
   elements.municipalityRows.innerHTML = "";
   for (const row of rows) {
@@ -176,6 +199,16 @@ function renderMunicipalities(rows) {
     `;
     elements.municipalityRows.append(tr);
   }
+}
+
+function personTypeLabel(value) {
+  if (value.toLowerCase().includes("juridica")) {
+    return "Pessoa Juridica";
+  }
+  if (value.toLowerCase().includes("fisica")) {
+    return "Pessoa Fisica";
+  }
+  return value;
 }
 
 function formatPeriod(value) {
