@@ -141,7 +141,7 @@ Decisao inicial de desempenho:
 
 A primeira importacao ampliada foi feita com o script `backend/scripts/import_csv_batched.py`.
 
-Resultado validado com o CSV real de 2026:
+Resultado validado com o CSV real de 2026 antes da otimizacao:
 
 ```text
 registros normalizados: 5.000
@@ -150,9 +150,18 @@ tamanho do lote: 1.000 registros
 tempo de gravacao no Supabase: 107,86 segundos
 ```
 
-A importacao funcionou e preservou a integridade do banco, mas o tempo ainda e alto para uma carga completa.
+Depois da otimizacao da gravacao em lote, o mesmo teste ficou assim:
 
-Decisao: antes de importar o arquivo inteiro, a escrita no banco deve ser otimizada para reduzir chamadas individuais ao Supabase.
+```text
+registros normalizados: 5.000
+lotes: 5
+tamanho do lote: 1.000 registros
+tempo de gravacao no Supabase: 3,77 segundos
+```
+
+A reimportacao nao duplicou dados. A contagem permaneceu em 5.002 registros mensais.
+
+Decisao: testar um volume maior antes de executar a carga completa.
 
 ## Experiencia do usuario
 
