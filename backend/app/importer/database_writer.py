@@ -257,3 +257,67 @@ class ImportDatabaseWriter:
         )
 
         return len(row_list)
+
+    def upsert_aggregated_subscription_rows(self, rows: Iterable[dict[str, object]]) -> int:
+        row_list = list(rows)
+        if not row_list:
+            return 0
+
+        self.session.execute(
+            text(
+                """
+                insert into public.aggregated_subscription_records(
+                    provider_id,
+                    import_batch_id,
+                    import_file_id,
+                    period,
+                    cnpj,
+                    company_name,
+                    municipality_code,
+                    municipality_name,
+                    state,
+                    technology,
+                    access_medium,
+                    person_type,
+                    subscriptions_count
+                )
+                values (
+                    :provider_id,
+                    :import_batch_id,
+                    :import_file_id,
+                    :period,
+                    :cnpj,
+                    :company_name,
+                    :municipality_code,
+                    :municipality_name,
+                    :state,
+                    :technology,
+                    :access_medium,
+                    :person_type,
+                    :subscriptions_count
+                )
+                on conflict (
+                    period,
+                    cnpj,
+                    company_name,
+                    municipality_code,
+                    municipality_name,
+                    state,
+                    technology,
+                    access_medium,
+                    person_type
+                ) do update
+                set provider_id = excluded.provider_id,
+                    import_batch_id = excluded.import_batch_id,
+                    import_file_id = excluded.import_file_id,
+                    company_name = excluded.company_name,
+                    municipality_name = excluded.municipality_name,
+                    state = excluded.state,
+                    subscriptions_count = excluded.subscriptions_count,
+                    updated_at = now()
+                """
+            ),
+            row_list,
+        )
+
+        return len(row_list)
