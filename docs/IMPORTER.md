@@ -137,6 +137,23 @@ Decisao inicial de desempenho:
 - preparar consultas agregadas no backend;
 - evitar enviar dados brutos grandes para o frontend.
 
+## Importacao por lotes
+
+A primeira importacao ampliada foi feita com o script `backend/scripts/import_csv_batched.py`.
+
+Resultado validado com o CSV real de 2026:
+
+```text
+registros normalizados: 5.000
+lotes: 5
+tamanho do lote: 1.000 registros
+tempo de gravacao no Supabase: 107,86 segundos
+```
+
+A importacao funcionou e preservou a integridade do banco, mas o tempo ainda e alto para uma carga completa.
+
+Decisao: antes de importar o arquivo inteiro, a escrita no banco deve ser otimizada para reduzir chamadas individuais ao Supabase.
+
 ## Experiencia do usuario
 
 O usuario nao deve precisar entender banco de dados, Python ou estrutura interna da ANATEL.
