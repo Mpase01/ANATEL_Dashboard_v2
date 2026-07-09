@@ -381,17 +381,26 @@ Objetivo:
 
 Criar uma estrutura de dados agregada e mais leve para caber no Supabase sem perder os recortes essenciais.
 
-Entregaveis previstos:
+Entregaveis realizados:
 
-- criar tabela agregada para prestadora, mes, municipio, tecnologia, meio de acesso e tipo de pessoa;
-- limpar ou isolar a carga parcial detalhada;
+- criacao do agregador em `backend/app/importer/aggregation.py`;
+- criacao do schema `database/aggregated_schema.sql`;
+- criacao do importador `backend/scripts/import_csv_aggregated.py`;
+- gravador preparado em `backend/app/importer/database_writer.py`;
+- testes para garantir que a agregacao preserva a soma;
+- documentacao da sprint em `docs/SPRINT_20.md`.
+
+Ainda pendente:
+
+- limpar ou isolar a carga parcial detalhada no Supabase;
+- aplicar a tabela agregada no banco real;
 - importar o CSV de 2026 na estrutura agregada;
 - ajustar API e dashboard para consultar a tabela agregada;
 - validar B2C/B2B no dashboard.
 
 Status:
 
-Planejada.
+Preparacao concluida. Aplicacao no Supabase aguardando confirmacao antes de apagar dados antigos.
 
 ## Sprint futura - Mapas
 
