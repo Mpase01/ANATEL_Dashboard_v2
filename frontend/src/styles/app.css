@@ -203,7 +203,7 @@ button:hover {
 }
 
 .panel.wide {
-  grid-row: span 2;
+  grid-row: span 3;
 }
 
 .panel-heading {
