@@ -390,17 +390,30 @@ Entregaveis realizados:
 - testes para garantir que a agregacao preserva a soma;
 - documentacao da sprint em `docs/SPRINT_20.md`.
 
-Ainda pendente:
+Status:
 
-- limpar ou isolar a carga parcial detalhada no Supabase;
-- aplicar a tabela agregada no banco real;
-- importar o CSV de 2026 na estrutura agregada;
-- ajustar API e dashboard para consultar a tabela agregada;
-- validar B2C/B2B no dashboard.
+Concluida.
+
+## Sprint 21 - Carga agregada real e dashboard B2C/B2B
+
+Objetivo:
+
+Aplicar a tabela agregada no Supabase real, importar o CSV completo de 2026 e ajustar API/dashboard para usar a base agregada.
+
+Entregaveis realizados:
+
+- limpeza da carga detalhada parcial antiga;
+- aplicacao de `aggregated_subscription_records` no Supabase;
+- importacao completa agregada de 839.183 registros;
+- preservacao da soma total de 280.681.407 acessos;
+- API apontada para a tabela agregada;
+- endpoint `GET /providers/{provider_id}/person-types`;
+- painel `Perfil do cliente` no frontend;
+- validacao de B2C/B2B com dados reais.
 
 Status:
 
-Preparacao concluida. Aplicacao no Supabase aguardando confirmacao antes de apagar dados antigos.
+Concluida.
 
 ## Sprint futura - Mapas
 
