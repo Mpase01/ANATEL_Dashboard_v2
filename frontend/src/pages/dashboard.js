@@ -96,7 +96,9 @@ function renderProviderOptions(providers) {
   for (const provider of providers) {
     const option = document.createElement("option");
     option.value = provider.id;
-    option.textContent = `${provider.name} - ${provider.cnpj}`;
+    const subscribers = Number(provider.latest_subscriptions_count || 0);
+    const suffix = subscribers ? ` - ${formatInteger.format(subscribers)} acessos` : "";
+    option.textContent = `${provider.name} - ${provider.cnpj}${suffix}`;
     elements.providerSelect.append(option);
   }
 }
