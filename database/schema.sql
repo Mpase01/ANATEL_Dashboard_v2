@@ -59,7 +59,7 @@ create table if not exists subscription_records (
     source_row_hash text not null,
     cnpj varchar(14) not null,
     company_name text not null,
-    speed_mbps numeric(12, 6),
+    speed_mbps numeric(18, 6),
     municipality_name text not null,
     state char(2) not null,
     speed_range text,
