@@ -170,7 +170,32 @@ tempo de gravacao no Supabase: 11,3 segundos
 
 A contagem final ficou em 50.002 registros mensais.
 
-Decisao: a carga completa do CSV de 2026 pode ser testada na proxima sprint, com monitoramento de tempo e resposta da API.
+## Carga completa de 2026
+
+O dry-run completo do CSV de 2026 identificou:
+
+```text
+registros normalizados: 3.222.220
+lotes de 10.000: 323
+tempo de leitura: 50,17 segundos
+```
+
+Durante a carga completa, foram feitos ajustes para aceitar velocidades maiores e reduzir problemas de conexao longa.
+
+A carga conseguiu chegar ao seguinte estado parcial:
+
+```text
+prestadoras: 4.448
+registros mensais: 1.590.002
+```
+
+A carga completa foi bloqueada por limite de armazenamento do Supabase:
+
+```text
+No space left on device
+```
+
+Decisao: antes de tentar novamente, e preciso aumentar o armazenamento do Supabase ou reduzir o volume gravado.
 
 ## Experiencia do usuario
 
