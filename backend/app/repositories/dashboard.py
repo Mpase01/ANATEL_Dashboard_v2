@@ -22,12 +22,15 @@ def _sql_text(statement: str):
     return text(statement)
 
 
+RECORDS_TABLE = "public.aggregated_subscription_records"
+
+
 def get_provider_summary(session: Any, provider_id: int, period: str = "all") -> dict[str, object] | None:
     statement = _sql_text(
-        """
+        f"""
         with selected_periods as (
             select distinct period
-            from public.subscription_records
+            from {RECORDS_TABLE}
             where provider_id = :provider_id
             order by period desc
             limit :period_limit
@@ -38,7 +41,7 @@ def get_provider_summary(session: Any, provider_id: int, period: str = "all") ->
         ),
         latest_records as (
             select sr.*
-            from public.subscription_records sr
+            from {RECORDS_TABLE} sr
             join period_bounds pb on pb.latest_period = sr.period
             where sr.provider_id = :provider_id
         ),
@@ -48,7 +51,7 @@ def get_provider_summary(session: Any, provider_id: int, period: str = "all") ->
         ),
         first_total as (
             select coalesce(sum(sr.subscriptions_count), 0)::integer as subscriptions_count
-            from public.subscription_records sr
+            from {RECORDS_TABLE} sr
             join period_bounds pb on pb.first_period = sr.period
             where sr.provider_id = :provider_id
         ),
@@ -66,7 +69,7 @@ def get_provider_summary(session: Any, provider_id: int, period: str = "all") ->
         ),
         national_totals as (
             select coalesce(sum(sr.subscriptions_count), 0)::integer as national_count
-            from public.subscription_records sr
+            from {RECORDS_TABLE} sr
             join period_bounds pb on pb.latest_period = sr.period
         ),
         top_municipality as (
@@ -125,10 +128,10 @@ def get_provider_summary(session: Any, provider_id: int, period: str = "all") ->
 
 def get_provider_evolution(session: Any, provider_id: int, period: str = "all") -> list[dict[str, object]]:
     statement = _sql_text(
-        """
+        f"""
         with selected_periods as (
             select distinct period
-            from public.subscription_records
+            from {RECORDS_TABLE}
             where provider_id = :provider_id
             order by period desc
             limit :period_limit
@@ -136,7 +139,7 @@ def get_provider_evolution(session: Any, provider_id: int, period: str = "all") 
         select
             sr.period,
             sum(sr.subscriptions_count)::integer as subscriptions_count
-        from public.subscription_records sr
+        from {RECORDS_TABLE} sr
         join selected_periods sp on sp.period = sr.period
         where sr.provider_id = :provider_id
         group by sr.period
@@ -154,10 +157,10 @@ def get_provider_evolution(session: Any, provider_id: int, period: str = "all") 
 
 def get_provider_technologies(session: Any, provider_id: int, period: str = "all") -> list[dict[str, object]]:
     statement = _sql_text(
-        """
+        f"""
         with selected_periods as (
             select distinct period
-            from public.subscription_records
+            from {RECORDS_TABLE}
             where provider_id = :provider_id
             order by period desc
             limit :period_limit
@@ -167,7 +170,7 @@ def get_provider_technologies(session: Any, provider_id: int, period: str = "all
         ),
         totals as (
             select sum(subscriptions_count)::numeric as total
-            from public.subscription_records sr
+            from {RECORDS_TABLE} sr
             join latest_period lp on lp.period = sr.period
             where sr.provider_id = :provider_id
         )
@@ -176,12 +179,52 @@ def get_provider_technologies(session: Any, provider_id: int, period: str = "all
             sr.access_medium,
             sum(sr.subscriptions_count)::integer as subscriptions_count,
             round((sum(sr.subscriptions_count)::numeric / nullif(t.total, 0)) * 100, 2) as share_percent
-        from public.subscription_records sr
+        from {RECORDS_TABLE} sr
         join latest_period lp on lp.period = sr.period
         cross join totals t
         where sr.provider_id = :provider_id
         group by sr.technology, sr.access_medium, t.total
         order by subscriptions_count desc, sr.technology, sr.access_medium
+        """
+    )
+    return [
+        dict(row)
+        for row in session.execute(
+            statement,
+            {"provider_id": provider_id, "period_limit": normalize_period_filter(period)},
+        ).mappings()
+    ]
+
+
+def get_provider_person_types(session: Any, provider_id: int, period: str = "all") -> list[dict[str, object]]:
+    statement = _sql_text(
+        f"""
+        with selected_periods as (
+            select distinct period
+            from {RECORDS_TABLE}
+            where provider_id = :provider_id
+            order by period desc
+            limit :period_limit
+        ),
+        latest_period as (
+            select max(period) as period from selected_periods
+        ),
+        totals as (
+            select sum(subscriptions_count)::numeric as total
+            from {RECORDS_TABLE} sr
+            join latest_period lp on lp.period = sr.period
+            where sr.provider_id = :provider_id
+        )
+        select
+            sr.person_type,
+            sum(sr.subscriptions_count)::integer as subscriptions_count,
+            round((sum(sr.subscriptions_count)::numeric / nullif(t.total, 0)) * 100, 2) as share_percent
+        from {RECORDS_TABLE} sr
+        join latest_period lp on lp.period = sr.period
+        cross join totals t
+        where sr.provider_id = :provider_id
+        group by sr.person_type, t.total
+        order by subscriptions_count desc, sr.person_type
         """
     )
     return [
@@ -201,10 +244,10 @@ def get_provider_municipalities(
 ) -> list[dict[str, object]]:
     limit = max(1, min(limit, 100))
     statement = _sql_text(
-        """
+        f"""
         with selected_periods as (
             select distinct period
-            from public.subscription_records
+            from {RECORDS_TABLE}
             where provider_id = :provider_id
             order by period desc
             limit :period_limit
@@ -217,7 +260,7 @@ def get_provider_municipalities(
             state,
             municipality_code,
             sum(subscriptions_count)::integer as subscriptions_count
-        from public.subscription_records sr
+        from {RECORDS_TABLE} sr
         join latest_period lp on lp.period = sr.period
         where sr.provider_id = :provider_id
         group by municipality_name, state, municipality_code
