@@ -24,12 +24,29 @@ class AggregatedSubscriptionRecord:
     subscriptions_count: int
 
 
+@dataclass(frozen=True)
+class AggregationResult:
+    records: list[AggregatedSubscriptionRecord]
+    raw_records_count: int
+    subscriptions_sum: int
+
+
 def aggregate_subscription_records(
     records: Iterable[SubscriptionRecord],
 ) -> list[AggregatedSubscriptionRecord]:
+    return aggregate_subscription_records_with_stats(records).records
+
+
+def aggregate_subscription_records_with_stats(
+    records: Iterable[SubscriptionRecord],
+) -> AggregationResult:
     totals: defaultdict[tuple[object, ...], int] = defaultdict(int)
+    raw_records_count = 0
+    subscriptions_sum = 0
 
     for record in records:
+        raw_records_count += 1
+        subscriptions_sum += record.subscriptions_count
         key = (
             record.cnpj,
             record.company_name,
@@ -43,7 +60,7 @@ def aggregate_subscription_records(
         )
         totals[key] += record.subscriptions_count
 
-    return [
+    aggregated_records = [
         AggregatedSubscriptionRecord(
             cnpj=str(cnpj),
             company_name=str(company_name),
@@ -68,6 +85,12 @@ def aggregate_subscription_records(
             person_type,
         ), subscriptions_count in sorted(totals.items())
     ]
+
+    return AggregationResult(
+        records=aggregated_records,
+        raw_records_count=raw_records_count,
+        subscriptions_sum=subscriptions_sum,
+    )
 
 
 def build_aggregated_subscription_rows(
