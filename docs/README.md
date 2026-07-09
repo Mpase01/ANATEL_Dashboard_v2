@@ -36,6 +36,7 @@ O objetivo da documentacao e manter o projeto simples de entender, facil de evol
 28. `SPRINT_17.md` - resume o teste ampliado com 50.000 registros normalizados.
 29. `SPRINT_18.md` - resume a tentativa de carga completa e o bloqueio de armazenamento.
 30. `SPRINT_19.md` - resume a simulacao de compactacao mantendo B2C/B2B.
+31. `SPRINT_20.md` - resume a preparacao da importacao agregada para reduzir uso do Supabase.
 
 ## Principio central
 
