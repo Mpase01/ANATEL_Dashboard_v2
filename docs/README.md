@@ -37,6 +37,7 @@ O objetivo da documentacao e manter o projeto simples de entender, facil de evol
 29. `SPRINT_18.md` - resume a tentativa de carga completa e o bloqueio de armazenamento.
 30. `SPRINT_19.md` - resume a simulacao de compactacao mantendo B2C/B2B.
 31. `SPRINT_20.md` - resume a preparacao da importacao agregada para reduzir uso do Supabase.
+32. `SPRINT_21.md` - resume a carga agregada real e o dashboard com B2C/B2B.
 
 ## Principio central
 
