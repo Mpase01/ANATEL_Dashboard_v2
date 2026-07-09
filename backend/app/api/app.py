@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from app.core.config import get_settings
 from app.db.session import session_scope
@@ -31,6 +32,30 @@ def create_app() -> FastAPI:
     @app.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.get("/health/database")
+    def database_health() -> dict[str, object]:
+        try:
+            with session_scope() as session:
+                result = session.execute(
+                    text(
+                        """
+                        select
+                            (select count(*) from public.providers) as providers_count,
+                            (select count(*) from public.subscription_records) as records_count
+                        """
+                    )
+                ).mappings().one()
+        except RuntimeError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+        except Exception as exc:
+            raise HTTPException(status_code=503, detail="Database connection failed.") from exc
+
+        return {
+            "status": "ok",
+            "providers_count": result["providers_count"],
+            "records_count": result["records_count"],
+        }
 
     @app.get("/providers/search")
     def providers_search(
