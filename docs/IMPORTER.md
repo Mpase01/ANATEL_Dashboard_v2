@@ -159,9 +159,18 @@ tamanho do lote: 1.000 registros
 tempo de gravacao no Supabase: 3,77 segundos
 ```
 
-A reimportacao nao duplicou dados. A contagem permaneceu em 5.002 registros mensais.
+Com volume maior, o resultado foi:
 
-Decisao: testar um volume maior antes de executar a carga completa.
+```text
+registros normalizados: 50.000
+lotes: 10
+tamanho do lote: 5.000 registros
+tempo de gravacao no Supabase: 11,3 segundos
+```
+
+A contagem final ficou em 50.002 registros mensais.
+
+Decisao: a carga completa do CSV de 2026 pode ser testada na proxima sprint, com monitoramento de tempo e resposta da API.
 
 ## Experiencia do usuario
 
