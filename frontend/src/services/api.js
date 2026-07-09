@@ -33,6 +33,10 @@ const demoDashboard = {
     { technology: "ETHERNET", access_medium: "Radio", subscriptions_count: 92, share_percent: 87.62 },
     { technology: "FTTH", access_medium: "Fibra", subscriptions_count: 13, share_percent: 12.38 },
   ],
+  personTypes: [
+    { person_type: "Pessoa Fisica", subscriptions_count: 94, share_percent: 89.52 },
+    { person_type: "Pessoa Juridica", subscriptions_count: 11, share_percent: 10.48 },
+  ],
   municipalities: [
     { municipality_name: "Lagoa Formosa", state: "MG", municipality_code: "3137502", subscriptions_count: 84 },
     { municipality_name: "Patos de Minas", state: "MG", municipality_code: "3148004", subscriptions_count: 21 },
@@ -78,14 +82,15 @@ export async function getProviderDashboard(providerId, period = "all") {
   }
 
   const params = new URLSearchParams({ period });
-  const [summary, evolution, technologies, municipalities] = await Promise.all([
+  const [summary, evolution, technologies, personTypes, municipalities] = await Promise.all([
     request(`/providers/${providerId}/summary?${params.toString()}`),
     request(`/providers/${providerId}/evolution?${params.toString()}`),
     request(`/providers/${providerId}/technologies?${params.toString()}`),
+    request(`/providers/${providerId}/person-types?${params.toString()}`),
     request(`/providers/${providerId}/municipalities?${new URLSearchParams({ period, limit: "20" }).toString()}`),
   ]);
 
-  return { summary, evolution, technologies, municipalities };
+  return { summary, evolution, technologies, personTypes, municipalities };
 }
 
 export function isDemoMode() {
