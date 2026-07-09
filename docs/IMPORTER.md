@@ -123,6 +123,25 @@ Pessoa Fisica  -> B2C
 Pessoa Juridica -> B2B
 ```
 
+## Implementacao agregada preparada
+
+A Sprint 20 preparou os arquivos para gravar a base compactada:
+
+```text
+backend/app/importer/aggregation.py
+database/aggregated_schema.sql
+backend/scripts/import_csv_aggregated.py
+backend/tests/test_importer_aggregation.py
+```
+
+A tabela planejada se chama:
+
+```text
+aggregated_subscription_records
+```
+
+Ela usa uma chave de atualizacao composta por periodo, prestadora, nome da prestadora, municipio, UF, tecnologia, meio de acesso e tipo de pessoa. Isso evita duplicidade e permite atualizar valores quando uma planilha mensal corrigida for enviada.
+
 ## Simulacao de compactacao
 
 Foi criado o script:
