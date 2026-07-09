@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Preparar o backend real para rodar localmente com FastAPI, como passo anterior a ligar a tela diretamente ao Supabase.
+Preparar o backend real para rodar localmente com FastAPI e ligar a tela local ao Supabase.
 
 ## O que foi feito
 
@@ -13,8 +13,10 @@ Preparar o backend real para rodar localmente com FastAPI, como passo anterior a
 - Foi criado o script `backend/scripts/run_api_local.py` para facilitar a execucao local da API real.
 - Foi criado o script `backend/scripts/check_database.py` para verificar a conexao com o banco.
 - O backend passou a carregar `.env` automaticamente quando o arquivo existir.
-- O `.gitignore` foi atualizado para ignorar dependencias e temporarios locais.
+- O `.gitignore` foi atualizado para ignorar dependencias, temporarios locais e `.env`.
 - Foi criado o guia `docs/SUPABASE_CONNECTION.md` para configurar a conexao local com seguranca.
+- A `DATABASE_URL` local foi configurada usando o Session pooler do Supabase.
+- O frontend local passou a apontar para `http://localhost:8001` por padrao.
 
 ## Validacao feita
 
@@ -24,40 +26,51 @@ A API real respondeu:
 {"status":"ok"}
 ```
 
-Tambem foi confirmado que os endpoints que dependem do banco retornam erro controlado quando `DATABASE_URL` nao esta configurado.
-
-Resposta observada em `GET /health/database`:
-
-```json
-{"detail":"DATABASE_URL is not configured."}
-```
-
-O verificador local tambem retorna uma mensagem simples quando a configuracao ainda falta:
+O verificador local confirmou a conexao com o Supabase:
 
 ```text
-Configuracao pendente: DATABASE_URL is not configured.
+Conexao com o banco OK.
+Prestadoras: 2
+Registros mensais: 26
 ```
+
+O endpoint `GET /health/database` confirmou:
+
+```json
+{
+  "status": "ok",
+  "providers_count": 2,
+  "records_count": 26
+}
+```
+
+A busca real retornou a prestadora de amostra:
+
+```json
+{
+  "id": 2,
+  "cnpj": "10785849000171",
+  "name": "NET-UAI INTERNET WIRELESS"
+}
+```
+
+A tela local em `http://127.0.0.1:5173/` foi recarregada e exibiu dados vindos da API real:
+
+- status: `Painel atualizado`;
+- periodo: `01/2026 a 05/2026`;
+- barras de evolucao: 5;
+- assinantes no ultimo mes: 105.
 
 ## Ponto importante
 
-A API real ja roda, mas ainda nao esta conectada ao Supabase localmente.
+A senha do banco fica somente no arquivo local `.env` e nao deve ser enviada ao GitHub.
 
-Para conectar, sera necessario configurar a variavel `DATABASE_URL` com uma string segura de conexao do banco Supabase. Essa informacao nao deve ser colocada no codigo nem enviada ao GitHub.
+Como a senha chegou a aparecer no chat durante a configuracao assistida, recomenda-se trocar a senha novamente no Supabase antes de uso definitivo/publicacao.
 
 ## Status
 
-Em andamento.
+Concluida.
 
 ## Proximo passo
 
-Configurar `DATABASE_URL` localmente e testar:
-
-```text
-python backend/scripts/check_database.py
-GET /health/database
-GET /providers/search?query=NET
-GET /providers/{provider_id}/summary?period=all
-GET /providers/{provider_id}/evolution?period=all
-```
-
-Depois disso, a tela podera apontar para a API real em vez da API de demonstracao.
+A proxima sprint deve preparar a importacao completa ou semi-completa dos CSVs reais, com cuidado para nao travar o banco nem a maquina local.
