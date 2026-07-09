@@ -49,6 +49,26 @@ GET /health
 
 Retorna se a API esta online.
 
+### Saude do banco
+
+```text
+GET /health/database
+```
+
+Retorna se a API consegue conectar ao banco configurado.
+
+Quando `DATABASE_URL` ainda nao esta configurado, retorna erro controlado `503`.
+
+Quando a conexao estiver funcionando, retorna:
+
+```json
+{
+  "status": "ok",
+  "providers_count": 0,
+  "records_count": 0
+}
+```
+
 ### Busca de provedores
 
 ```text
