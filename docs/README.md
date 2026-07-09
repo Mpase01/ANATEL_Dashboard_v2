@@ -32,6 +32,7 @@ O objetivo da documentacao e manter o projeto simples de entender, facil de evol
 24. `SPRINT_13.md` - resume o filtro temporal no contrato da API.
 25. `SPRINT_14.md` - resume a preparacao local do backend real.
 26. `SPRINT_15.md` - resume a importacao ampliada por lotes com dados reais.
+27. `SPRINT_16.md` - resume a otimizacao da gravacao em lote no Supabase.
 
 ## Principio central
 
