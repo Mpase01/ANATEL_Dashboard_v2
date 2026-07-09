@@ -356,20 +356,38 @@ Status:
 
 Bloqueada por limite de armazenamento do Supabase.
 
-## Sprint 19 - Decisao de armazenamento e volume
+## Sprint 19 - Simulacao de compactacao
 
 Objetivo:
 
-Decidir como seguir depois do bloqueio de armazenamento encontrado na carga completa.
+Simular uma base agregada que preserve os recortes importantes do dashboard, incluindo B2C/B2B.
+
+Entregaveis:
+
+- script `backend/scripts/simulate_compaction.py`;
+- simulacao completa do CSV de 2026;
+- manutencao do recorte `Pessoa Fisica` e `Pessoa Juridica`;
+- reducao medida de 3.222.220 para 839.183 linhas;
+- preservacao da soma total de assinantes;
+- decisao de seguir para tabela agregada.
+
+Status:
+
+Concluida.
+
+## Sprint 20 - Estrutura agregada no Supabase
+
+Objetivo:
+
+Criar uma estrutura de dados agregada e mais leve para caber no Supabase sem perder os recortes essenciais.
 
 Entregaveis previstos:
 
-- avaliar custo/viabilidade de aumentar armazenamento do Supabase;
-- avaliar limpeza da carga parcial antes de nova tentativa;
-- avaliar reducao do volume gravado por agregacao;
-- revisar colunas e indices para reduzir espaco;
-- decidir se o dashboard precisa manter todos os registros detalhados;
-- escolher a estrategia antes de importar 2025 ou retentar 2026 completo.
+- criar tabela agregada para prestadora, mes, municipio, tecnologia, meio de acesso e tipo de pessoa;
+- limpar ou isolar a carga parcial detalhada;
+- importar o CSV de 2026 na estrutura agregada;
+- ajustar API e dashboard para consultar a tabela agregada;
+- validar B2C/B2B no dashboard.
 
 Status:
 
