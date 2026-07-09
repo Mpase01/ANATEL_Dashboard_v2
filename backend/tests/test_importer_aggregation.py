@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.importer.aggregation import (
     aggregate_subscription_records,
+    aggregate_subscription_records_with_stats,
     build_aggregated_subscription_rows,
 )
 from app.importer.anatel_csv import iter_subscription_records
@@ -26,6 +27,15 @@ class ImporterAggregationTest(unittest.TestCase):
         self.assertEqual(sum(record.subscriptions_count for record in aggregated), 26)
         self.assertEqual(aggregated[0].subscriptions_count, 14)
         self.assertEqual(aggregated[1].subscriptions_count, 12)
+
+    def test_aggregation_result_reports_raw_count_and_sum(self):
+        records = list(iter_subscription_records(FIXTURES_DIR / "sample_ascii.csv"))
+
+        result = aggregate_subscription_records_with_stats(records)
+
+        self.assertEqual(result.raw_records_count, 2)
+        self.assertEqual(result.subscriptions_sum, 22)
+        self.assertEqual(len(result.records), 2)
 
     def test_builds_aggregated_database_rows(self):
         records = list(iter_subscription_records(FIXTURES_DIR / "sample_ascii.csv"))
