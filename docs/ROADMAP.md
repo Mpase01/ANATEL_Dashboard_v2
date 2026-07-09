@@ -324,13 +324,32 @@ Objetivo:
 
 Testar a importacao otimizada com um volume maior antes da carga completa.
 
+Entregaveis:
+
+- importacao de 50.000 registros normalizados do CSV real;
+- tempo total medido em 11,3 segundos;
+- validacao de 50.002 registros mensais no banco;
+- API real validada com a base maior;
+- endpoints do dashboard validados.
+
+Status:
+
+Concluida.
+
+## Sprint 18 - Carga completa do CSV de 2026
+
+Objetivo:
+
+Executar a carga completa do CSV real de 2026 e validar o dashboard com a base completa disponivel.
+
 Entregaveis previstos:
 
-- importar 50.000 registros normalizados do CSV real;
-- medir tempo total;
-- validar contagens no banco;
-- verificar resposta do dashboard com base maior;
-- decidir se a carga completa ja pode ser executada.
+- importar todos os registros normalizados do CSV de 2026;
+- medir tempo total da carga completa;
+- validar contagens finais no banco;
+- validar endpoints do dashboard;
+- avaliar se registros ficticios de teste devem ser removidos antes do uso final;
+- decidir se a base de 2025 deve ser importada em seguida.
 
 Status:
 
