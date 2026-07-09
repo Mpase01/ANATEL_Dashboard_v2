@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from sqlalchemy import text
+from sqlalchemy import bindparam, text
 from sqlalchemy.orm import Session
 
 
@@ -79,24 +79,36 @@ class ImportDatabaseWriter:
         )
 
     def upsert_providers(self, provider_rows: Iterable[dict[str, str]]) -> dict[str, int]:
-        provider_ids_by_cnpj: dict[str, int] = {}
-        for row in provider_rows:
-            result = self.session.execute(
-                text(
-                    """
-                    insert into public.providers(cnpj, primary_name)
-                    values (:cnpj, :primary_name)
-                    on conflict (cnpj) do update
-                    set primary_name = excluded.primary_name,
-                        updated_at = now()
-                    returning id
-                    """
-                ),
-                row,
-            )
-            provider_ids_by_cnpj[row["cnpj"]] = int(result.scalar_one())
+        rows = list(provider_rows)
+        if not rows:
+            return {}
 
-        return provider_ids_by_cnpj
+        self.session.execute(
+            text(
+                """
+                insert into public.providers(cnpj, primary_name)
+                values (:cnpj, :primary_name)
+                on conflict (cnpj) do update
+                set primary_name = excluded.primary_name,
+                    updated_at = now()
+                """
+            ),
+            rows,
+        )
+
+        cnpjs = [row["cnpj"] for row in rows]
+        result = self.session.execute(
+            text(
+                """
+                select cnpj, id
+                from public.providers
+                where cnpj in :cnpjs
+                """
+            ).bindparams(bindparam("cnpjs", expanding=True)),
+            {"cnpjs": cnpjs},
+        )
+
+        return {str(cnpj): int(provider_id) for cnpj, provider_id in result}
 
     def upsert_provider_aliases(
         self,
@@ -104,18 +116,23 @@ class ImportDatabaseWriter:
         *,
         provider_ids_by_cnpj: dict[str, int],
     ) -> None:
-        for row in alias_rows:
-            provider_id = provider_ids_by_cnpj[row["cnpj"]]
-            self.session.execute(
-                text(
-                    """
-                    insert into public.provider_aliases(provider_id, alias_name)
-                    values (:provider_id, :alias_name)
-                    on conflict (provider_id, alias_name) do nothing
-                    """
-                ),
-                {"provider_id": provider_id, "alias_name": row["alias_name"]},
-            )
+        rows = [
+            {"provider_id": provider_ids_by_cnpj[row["cnpj"]], "alias_name": row["alias_name"]}
+            for row in alias_rows
+        ]
+        if not rows:
+            return
+
+        self.session.execute(
+            text(
+                """
+                insert into public.provider_aliases(provider_id, alias_name)
+                values (:provider_id, :alias_name)
+                on conflict (provider_id, alias_name) do nothing
+                """
+            ),
+            rows,
+        )
 
     def upsert_import_file(
         self,
@@ -167,75 +184,76 @@ class ImportDatabaseWriter:
         return int(result.scalar_one())
 
     def upsert_subscription_rows(self, rows: Iterable[dict[str, object]]) -> int:
-        written = 0
-        for row in rows:
-            self.session.execute(
-                text(
-                    """
-                    insert into public.subscription_records(
-                        provider_id,
-                        import_batch_id,
-                        import_file_id,
-                        period,
-                        source_row_hash,
-                        cnpj,
-                        company_name,
-                        speed_mbps,
-                        municipality_name,
-                        state,
-                        speed_range,
-                        technology,
-                        provider_size,
-                        person_type,
-                        product_type,
-                        municipality_code,
-                        economic_group,
-                        access_medium,
-                        subscriptions_count
-                    )
-                    values (
-                        :provider_id,
-                        :import_batch_id,
-                        :import_file_id,
-                        :period,
-                        :source_row_hash,
-                        :cnpj,
-                        :company_name,
-                        :speed_mbps,
-                        :municipality_name,
-                        :state,
-                        :speed_range,
-                        :technology,
-                        :provider_size,
-                        :person_type,
-                        :product_type,
-                        :municipality_code,
-                        :economic_group,
-                        :access_medium,
-                        :subscriptions_count
-                    )
-                    on conflict (period, source_row_hash) do update
-                    set provider_id = excluded.provider_id,
-                        import_batch_id = excluded.import_batch_id,
-                        import_file_id = excluded.import_file_id,
-                        company_name = excluded.company_name,
-                        speed_mbps = excluded.speed_mbps,
-                        municipality_name = excluded.municipality_name,
-                        state = excluded.state,
-                        speed_range = excluded.speed_range,
-                        technology = excluded.technology,
-                        provider_size = excluded.provider_size,
-                        person_type = excluded.person_type,
-                        product_type = excluded.product_type,
-                        municipality_code = excluded.municipality_code,
-                        economic_group = excluded.economic_group,
-                        access_medium = excluded.access_medium,
-                        subscriptions_count = excluded.subscriptions_count,
-                        updated_at = now()
-                    """
-                ),
-                row,
-            )
-            written += 1
+        row_list = list(rows)
+        if not row_list:
+            return 0
 
-        return written
+        self.session.execute(
+            text(
+                """
+                insert into public.subscription_records(
+                    provider_id,
+                    import_batch_id,
+                    import_file_id,
+                    period,
+                    source_row_hash,
+                    cnpj,
+                    company_name,
+                    speed_mbps,
+                    municipality_name,
+                    state,
+                    speed_range,
+                    technology,
+                    provider_size,
+                    person_type,
+                    product_type,
+                    municipality_code,
+                    economic_group,
+                    access_medium,
+                    subscriptions_count
+                )
+                values (
+                    :provider_id,
+                    :import_batch_id,
+                    :import_file_id,
+                    :period,
+                    :source_row_hash,
+                    :cnpj,
+                    :company_name,
+                    :speed_mbps,
+                    :municipality_name,
+                    :state,
+                    :speed_range,
+                    :technology,
+                    :provider_size,
+                    :person_type,
+                    :product_type,
+                    :municipality_code,
+                    :economic_group,
+                    :access_medium,
+                    :subscriptions_count
+                )
+                on conflict (period, source_row_hash) do update
+                set provider_id = excluded.provider_id,
+                    import_batch_id = excluded.import_batch_id,
+                    import_file_id = excluded.import_file_id,
+                    company_name = excluded.company_name,
+                    speed_mbps = excluded.speed_mbps,
+                    municipality_name = excluded.municipality_name,
+                    state = excluded.state,
+                    speed_range = excluded.speed_range,
+                    technology = excluded.technology,
+                    provider_size = excluded.provider_size,
+                    person_type = excluded.person_type,
+                    product_type = excluded.product_type,
+                    municipality_code = excluded.municipality_code,
+                    economic_group = excluded.economic_group,
+                    access_medium = excluded.access_medium,
+                    subscriptions_count = excluded.subscriptions_count,
+                    updated_at = now()
+                """
+            ),
+            row_list,
+        )
+
+        return len(row_list)
