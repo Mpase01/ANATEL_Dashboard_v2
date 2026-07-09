@@ -342,14 +342,34 @@ Objetivo:
 
 Executar a carga completa do CSV real de 2026 e validar o dashboard com a base completa disponivel.
 
+Entregaveis realizados:
+
+- dry-run completo com 3.222.220 registros normalizados;
+- ajuste de `speed_mbps` para `numeric(18, 6)`;
+- importador ajustado para conexao por lote;
+- sessao de banco ajustada para transacao de escrita;
+- carga parcial validada com 4.448 prestadoras;
+- carga parcial validada com 1.590.002 registros mensais;
+- identificacao de limite de armazenamento no Supabase.
+
+Status:
+
+Bloqueada por limite de armazenamento do Supabase.
+
+## Sprint 19 - Decisao de armazenamento e volume
+
+Objetivo:
+
+Decidir como seguir depois do bloqueio de armazenamento encontrado na carga completa.
+
 Entregaveis previstos:
 
-- importar todos os registros normalizados do CSV de 2026;
-- medir tempo total da carga completa;
-- validar contagens finais no banco;
-- validar endpoints do dashboard;
-- avaliar se registros ficticios de teste devem ser removidos antes do uso final;
-- decidir se a base de 2025 deve ser importada em seguida.
+- avaliar custo/viabilidade de aumentar armazenamento do Supabase;
+- avaliar limpeza da carga parcial antes de nova tentativa;
+- avaliar reducao do volume gravado por agregacao;
+- revisar colunas e indices para reduzir espaco;
+- decidir se o dashboard precisa manter todos os registros detalhados;
+- escolher a estrategia antes de importar 2025 ou retentar 2026 completo.
 
 Status:
 
