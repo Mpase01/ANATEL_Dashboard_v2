@@ -44,6 +44,7 @@ Caracteristicas relevantes:
 - O sistema deve ignorar registros mensais com zero assinantes.
 - O sistema deve usar CNPJ como identificador principal do provedor.
 - O sistema deve registrar nomes de empresa como aliases quando necessario.
+- O sistema deve preservar `Pessoa Fisica` e `Pessoa Juridica` para analise B2C/B2B.
 
 ## Fluxo planejado
 
@@ -62,9 +63,7 @@ Transformacao dos meses em linhas
 ↓
 Descarte dos registros mensais com zero assinantes
 ↓
-Calculo do source_row_hash da linha original
-↓
-Validacao dos registros
+Agregacao para o nivel usado pelo dashboard
 ↓
 Registro do lote de importacao
 ↓
@@ -98,13 +97,68 @@ Quando um arquivo atualizado for enviado, o sistema deve:
 - atualizar registros de meses antigos caso os valores tenham mudado;
 - manter o historico anterior.
 
+## Estrategia agregada
+
+A carga detalhada completa de 2026 nao coube no armazenamento atual do Supabase.
+
+A estrategia recomendada passou a ser gravar uma tabela agregada, mantendo apenas os recortes essenciais para o dashboard:
+
+```text
+prestadora
+nome da prestadora
+mes
+codigo IBGE do municipio
+municipio
+UF
+tecnologia
+meio de acesso
+tipo de pessoa
+assinantes somados
+```
+
+O campo `tipo de pessoa` deve ser mantido porque permite analisar:
+
+```text
+Pessoa Fisica  -> B2C
+Pessoa Juridica -> B2B
+```
+
+## Simulacao de compactacao
+
+Foi criado o script:
+
+```text
+backend/scripts/simulate_compaction.py
+```
+
+Resultado com o CSV real de 2026:
+
+```text
+base bruta: 3.222.220 registros
+base compactada: 839.183 registros
+reducao: 73,96%
+tempo de simulacao: 47,16 segundos
+```
+
+A soma de assinantes foi preservada:
+
+```text
+base bruta: 280.681.407
+base compactada: 280.681.407
+```
+
+Distribuicao por tipo de pessoa:
+
+```text
+Pessoa Fisica: 248.478.363 assinantes-mes
+Pessoa Juridica: 32.203.044 assinantes-mes
+```
+
 ## Deteccao de mudancas
 
 Cada arquivo deve ter uma assinatura tecnica, chamada `file_hash`.
 
-Cada linha fixa da ANATEL tambem deve gerar um `source_row_hash`.
-
-A combinacao `period + source_row_hash` sera usada para evitar duplicidade na tabela principal.
+Na estrutura agregada, a chave de atualizacao deve considerar a combinacao dos campos agregados, incluindo periodo e tipo de pessoa.
 
 ## Validacoes esperadas
 
@@ -117,6 +171,7 @@ O importador deve validar pelo menos:
 - codigo IBGE do municipio quando disponivel;
 - tecnologia;
 - meio de acesso;
+- tipo de pessoa;
 - valores numericos de assinantes;
 - linhas vazias ou inconsistentes.
 
@@ -130,72 +185,14 @@ O sistema deve registrar o erro no lote de importacao e informar o usuario de fo
 
 Como os arquivos sao pesados, o importador deve evitar carregar e gravar mais dados do que o necessario.
 
-Decisao inicial de desempenho:
+Decisao atual de desempenho:
 
 - nao gravar registros mensais com zero assinantes;
 - processar colunas mensais automaticamente;
+- agregar antes de gravar;
+- manter B2C/B2B;
 - preparar consultas agregadas no backend;
 - evitar enviar dados brutos grandes para o frontend.
-
-## Importacao por lotes
-
-A primeira importacao ampliada foi feita com o script `backend/scripts/import_csv_batched.py`.
-
-Resultado validado com o CSV real de 2026 antes da otimizacao:
-
-```text
-registros normalizados: 5.000
-lotes: 5
-tamanho do lote: 1.000 registros
-tempo de gravacao no Supabase: 107,86 segundos
-```
-
-Depois da otimizacao da gravacao em lote, o mesmo teste ficou assim:
-
-```text
-registros normalizados: 5.000
-lotes: 5
-tamanho do lote: 1.000 registros
-tempo de gravacao no Supabase: 3,77 segundos
-```
-
-Com volume maior, o resultado foi:
-
-```text
-registros normalizados: 50.000
-lotes: 10
-tamanho do lote: 5.000 registros
-tempo de gravacao no Supabase: 11,3 segundos
-```
-
-A contagem final ficou em 50.002 registros mensais.
-
-## Carga completa de 2026
-
-O dry-run completo do CSV de 2026 identificou:
-
-```text
-registros normalizados: 3.222.220
-lotes de 10.000: 323
-tempo de leitura: 50,17 segundos
-```
-
-Durante a carga completa, foram feitos ajustes para aceitar velocidades maiores e reduzir problemas de conexao longa.
-
-A carga conseguiu chegar ao seguinte estado parcial:
-
-```text
-prestadoras: 4.448
-registros mensais: 1.590.002
-```
-
-A carga completa foi bloqueada por limite de armazenamento do Supabase:
-
-```text
-No space left on device
-```
-
-Decisao: antes de tentar novamente, e preciso aumentar o armazenamento do Supabase ou reduzir o volume gravado.
 
 ## Experiencia do usuario
 
