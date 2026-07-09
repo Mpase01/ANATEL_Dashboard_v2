@@ -264,20 +264,39 @@ Objetivo:
 
 Ligar a tela local ao backend real e ao Supabase, substituindo a API de demonstracao no uso normal.
 
-Entregaveis previstos:
+Entregaveis:
 
 - dependencias do backend instaladas ou preparadas;
 - FastAPI real rodando localmente;
 - carregamento local de `.env`;
 - verificador de conexao com banco;
 - `DATABASE_URL` local configurado com seguranca;
+- endpoint `GET /health/database` validado;
 - tela consumindo endpoints reais;
 - mensagens melhores para erro de API;
-- preparacao para importacao completa com progresso.
+- documentacao da conexao local.
 
 Status:
 
-Em andamento. A API real ja roda localmente e o verificador de banco ja existe, mas ainda falta configurar `DATABASE_URL` para conectar ao Supabase.
+Concluida.
+
+## Sprint 15 - Importacao ampliada dos CSVs reais
+
+Objetivo:
+
+Importar um volume maior dos CSVs reais com seguranca, medindo tempo, volume e impacto antes da carga completa.
+
+Entregaveis previstos:
+
+- estrategia de importacao por lotes;
+- medicao de tempo por lote;
+- validacao de contagens depois da importacao;
+- protecao contra duplicidade;
+- preparacao para barra de progresso.
+
+Status:
+
+Planejada.
 
 ## Sprint futura - Mapas
 
