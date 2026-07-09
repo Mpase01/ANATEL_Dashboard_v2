@@ -25,7 +25,7 @@ O arquivo `.env` fica apenas no computador local e ja esta ignorado pelo `.gitig
 DATABASE_URL=postgresql+psycopg://postgres:SUA-SENHA@SEU-HOST:5432/postgres
 ```
 
-## Conferir se funcionou
+## Conferir se funcionou pelo terminal
 
 Depois de configurar o `.env`, rode o verificador:
 
@@ -39,6 +39,30 @@ Quando estiver correto, ele deve mostrar:
 Conexao com o banco OK.
 Prestadoras: ...
 Registros mensais: ...
+```
+
+## Conferir se funcionou pelo navegador
+
+Com a API real rodando, abra:
+
+```text
+http://127.0.0.1:8001/health/database
+```
+
+Quando estiver correto, a resposta sera parecida com:
+
+```json
+{
+  "status": "ok",
+  "providers_count": 2,
+  "records_count": 26
+}
+```
+
+Se ainda faltar configuracao, a resposta sera `503` com uma mensagem como:
+
+```json
+{"detail":"DATABASE_URL is not configured."}
 ```
 
 ## Rodar a API real local
