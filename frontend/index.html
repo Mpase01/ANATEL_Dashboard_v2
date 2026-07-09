@@ -19,7 +19,7 @@
       <section class="toolbar" aria-label="Busca de prestadora">
         <label class="search-field">
           <span>Prestadora ou CNPJ</span>
-          <input id="providerQuery" type="search" value="NET" autocomplete="off" />
+          <input id="providerQuery" type="search" value="CLARO" autocomplete="off" />
         </label>
         <button id="searchButton" type="button">Buscar</button>
         <select id="providerSelect" aria-label="Prestadora encontrada"></select>
@@ -34,7 +34,7 @@
       </section>
 
       <p class="notice">
-        Visualizacao de amostra: recorte pequeno do CSV 2026. A carga completa da ANATEL ainda nao foi feita.
+        Base agregada carregada com o CSV 2026 da ANATEL. Os valores preservam os acessos totais e permitem separar B2C e B2B.
       </p>
 
       <section class="summary-grid" aria-label="Indicadores principais">
@@ -71,6 +71,11 @@
         <section class="panel" aria-labelledby="techTitle">
           <h2 id="techTitle">Tecnologias</h2>
           <div id="technologyList" class="stack-list"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="personTypeTitle">
+          <h2 id="personTypeTitle">Perfil do cliente</h2>
+          <div id="personTypeList" class="stack-list"></div>
         </section>
 
         <section class="panel" aria-labelledby="cityTitle">
