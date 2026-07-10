@@ -38,6 +38,13 @@
             <option value="latest">Ultimo mes</option>
           </select>
         </label>
+        <label class="search-field">
+          <span>Evolucao</span>
+          <select id="granularityFilter" aria-label="Agrupamento da evolucao">
+            <option value="month">Mes</option>
+            <option value="quarter">Trimestre</option>
+          </select>
+        </label>
       </section>
 
       <p class="notice">
@@ -48,6 +55,7 @@
         <article class="metric">
           <span>Assinantes no ultimo mes</span>
           <strong id="metricSubscriptions">-</strong>
+          <small id="metricClientMix">-</small>
         </article>
         <article class="metric">
           <span>Participacao fibra</span>
@@ -58,7 +66,7 @@
           <strong id="metricMunicipalities">-</strong>
         </article>
         <article class="metric">
-          <span>Crescimento no recorte</span>
+          <span>Crescimento LTM</span>
           <strong id="metricGrowth">-</strong>
         </article>
       </section>
@@ -76,7 +84,7 @@
         </section>
 
         <section class="panel" aria-labelledby="techTitle">
-          <h2 id="techTitle">Tecnologias</h2>
+          <h2 id="techTitle">Meio de acesso</h2>
           <div id="technologyList" class="stack-list"></div>
         </section>
 
@@ -94,6 +102,10 @@
                   <th>Municipio</th>
                   <th>UF</th>
                   <th>Acessos</th>
+                  <th>Share</th>
+                  <th>Fibra</th>
+                  <th>B2B</th>
+                  <th>B2C</th>
                 </tr>
               </thead>
               <tbody id="municipalityRows"></tbody>
