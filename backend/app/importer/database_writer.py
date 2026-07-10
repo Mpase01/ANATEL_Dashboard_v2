@@ -277,7 +277,6 @@ class ImportDatabaseWriter:
                     municipality_code,
                     municipality_name,
                     state,
-                    technology,
                     access_medium,
                     person_type,
                     subscriptions_count
@@ -293,7 +292,6 @@ class ImportDatabaseWriter:
                     :municipality_code,
                     :municipality_name,
                     :state,
-                    :technology,
                     :access_medium,
                     :person_type,
                     :subscriptions_count
@@ -306,7 +304,6 @@ class ImportDatabaseWriter:
                     municipality_code,
                     municipality_name,
                     state,
-                    technology,
                     access_medium,
                     person_type
                 ) do update
