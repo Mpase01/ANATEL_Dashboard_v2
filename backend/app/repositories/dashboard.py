@@ -58,8 +58,13 @@ def get_provider_summary(session: Any, provider_id: int, period: str = "all") ->
         fiber_totals as (
             select coalesce(sum(subscriptions_count), 0)::integer as fiber_count
             from latest_records
-            where lower(access_medium) like '%fibra%'
-               or lower(technology) like '%ftth%'
+            where access_medium = 'Fibra'
+        ),
+        client_profile as (
+            select
+                coalesce(sum(subscriptions_count) filter (where lower(person_type) like '%jur%dica%'), 0)::integer as b2b_count,
+                coalesce(sum(subscriptions_count) filter (where lower(person_type) like '%f%sica%'), 0)::integer as b2c_count
+            from latest_records
         ),
         footprint as (
             select
@@ -93,7 +98,11 @@ def get_provider_summary(session: Any, provider_id: int, period: str = "all") ->
             pb.latest_period as period,
             lt.subscriptions_count,
             ft.fiber_count,
+            cp.b2b_count,
+            cp.b2c_count,
             round((ft.fiber_count::numeric / nullif(lt.subscriptions_count, 0)) * 100, 2) as fiber_share_percent,
+            round((cp.b2b_count::numeric / nullif(lt.subscriptions_count, 0)) * 100, 2) as b2b_share_percent,
+            round((cp.b2c_count::numeric / nullif(lt.subscriptions_count, 0)) * 100, 2) as b2c_share_percent,
             round((lt.subscriptions_count::numeric / nullif(nt.national_count, 0)) * 100, 2) as market_share_percent,
             fp.municipalities_count,
             fp.states_count,
@@ -109,6 +118,7 @@ def get_provider_summary(session: Any, provider_id: int, period: str = "all") ->
         cross join latest_total lt
         cross join first_total fst
         cross join fiber_totals ft
+        cross join client_profile cp
         cross join footprint fp
         cross join national_totals nt
         left join top_municipality tm on true
@@ -175,7 +185,6 @@ def get_provider_technologies(session: Any, provider_id: int, period: str = "all
             where sr.provider_id = :provider_id
         )
         select
-            sr.technology,
             sr.access_medium,
             sum(sr.subscriptions_count)::integer as subscriptions_count,
             round((sum(sr.subscriptions_count)::numeric / nullif(t.total, 0)) * 100, 2) as share_percent
@@ -183,8 +192,8 @@ def get_provider_technologies(session: Any, provider_id: int, period: str = "all
         join latest_period lp on lp.period = sr.period
         cross join totals t
         where sr.provider_id = :provider_id
-        group by sr.technology, sr.access_medium, t.total
-        order by subscriptions_count desc, sr.technology, sr.access_medium
+        group by sr.access_medium, t.total
+        order by subscriptions_count desc, sr.access_medium
         """
     )
     return [
@@ -254,16 +263,30 @@ def get_provider_municipalities(
         ),
         latest_period as (
             select max(period) as period from selected_periods
+        ),
+        city_market as (
+            select
+                municipality_code,
+                sum(subscriptions_count)::numeric as city_total
+            from {RECORDS_TABLE} sr
+            join latest_period lp on lp.period = sr.period
+            group by municipality_code
         )
         select
-            municipality_name,
-            state,
-            municipality_code,
-            sum(subscriptions_count)::integer as subscriptions_count
+            sr.municipality_name,
+            sr.state,
+            sr.municipality_code,
+            sum(sr.subscriptions_count)::integer as subscriptions_count,
+            round((sum(sr.subscriptions_count)::numeric / nullif(cm.city_total, 0)) * 100, 2) as market_share_percent,
+            coalesce(sum(sr.subscriptions_count) filter (where sr.access_medium = 'Fibra'), 0)::integer as fiber_count,
+            round((coalesce(sum(sr.subscriptions_count) filter (where sr.access_medium = 'Fibra'), 0)::numeric / nullif(sum(sr.subscriptions_count), 0)) * 100, 2) as fiber_share_percent,
+            coalesce(sum(sr.subscriptions_count) filter (where lower(sr.person_type) like '%jur%dica%'), 0)::integer as b2b_count,
+            coalesce(sum(sr.subscriptions_count) filter (where lower(sr.person_type) like '%f%sica%'), 0)::integer as b2c_count
         from {RECORDS_TABLE} sr
         join latest_period lp on lp.period = sr.period
+        join city_market cm on cm.municipality_code = sr.municipality_code
         where sr.provider_id = :provider_id
-        group by municipality_name, state, municipality_code
+        group by sr.municipality_name, sr.state, sr.municipality_code, cm.city_total
         order by subscriptions_count desc, municipality_name
         limit :limit
         """
@@ -314,8 +337,13 @@ def get_economic_group_summary(session: Any, economic_group: str, period: str = 
         fiber_totals as (
             select coalesce(sum(subscriptions_count), 0)::integer as fiber_count
             from latest_records
-            where lower(access_medium) like '%fibra%'
-               or lower(technology) like '%ftth%'
+            where access_medium = 'Fibra'
+        ),
+        client_profile as (
+            select
+                coalesce(sum(subscriptions_count) filter (where lower(person_type) like '%jur%dica%'), 0)::integer as b2b_count,
+                coalesce(sum(subscriptions_count) filter (where lower(person_type) like '%f%sica%'), 0)::integer as b2c_count
+            from latest_records
         ),
         footprint as (
             select
@@ -349,7 +377,11 @@ def get_economic_group_summary(session: Any, economic_group: str, period: str = 
             pb.latest_period as period,
             lt.subscriptions_count,
             ft.fiber_count,
+            cp.b2b_count,
+            cp.b2c_count,
             round((ft.fiber_count::numeric / nullif(lt.subscriptions_count, 0)) * 100, 2) as fiber_share_percent,
+            round((cp.b2b_count::numeric / nullif(lt.subscriptions_count, 0)) * 100, 2) as b2b_share_percent,
+            round((cp.b2c_count::numeric / nullif(lt.subscriptions_count, 0)) * 100, 2) as b2c_share_percent,
             round((lt.subscriptions_count::numeric / nullif(nt.national_count, 0)) * 100, 2) as market_share_percent,
             fp.municipalities_count,
             fp.states_count,
@@ -364,6 +396,7 @@ def get_economic_group_summary(session: Any, economic_group: str, period: str = 
         cross join latest_total lt
         cross join first_total fst
         cross join fiber_totals ft
+        cross join client_profile cp
         cross join footprint fp
         cross join national_totals nt
         left join top_municipality tm on true
@@ -429,7 +462,6 @@ def get_economic_group_technologies(session: Any, economic_group: str, period: s
             where sr.economic_group = :economic_group
         )
         select
-            sr.technology,
             sr.access_medium,
             sum(sr.subscriptions_count)::integer as subscriptions_count,
             round((sum(sr.subscriptions_count)::numeric / nullif(t.total, 0)) * 100, 2) as share_percent
@@ -437,8 +469,8 @@ def get_economic_group_technologies(session: Any, economic_group: str, period: s
         join latest_period lp on lp.period = sr.period
         cross join totals t
         where sr.economic_group = :economic_group
-        group by sr.technology, sr.access_medium, t.total
-        order by subscriptions_count desc, sr.technology, sr.access_medium
+        group by sr.access_medium, t.total
+        order by subscriptions_count desc, sr.access_medium
         """
     )
     return [
@@ -508,16 +540,30 @@ def get_economic_group_municipalities(
         ),
         latest_period as (
             select max(period) as period from selected_periods
+        ),
+        city_market as (
+            select
+                municipality_code,
+                sum(subscriptions_count)::numeric as city_total
+            from {RECORDS_TABLE} sr
+            join latest_period lp on lp.period = sr.period
+            group by municipality_code
         )
         select
-            municipality_name,
-            state,
-            municipality_code,
-            sum(subscriptions_count)::integer as subscriptions_count
+            sr.municipality_name,
+            sr.state,
+            sr.municipality_code,
+            sum(sr.subscriptions_count)::integer as subscriptions_count,
+            round((sum(sr.subscriptions_count)::numeric / nullif(cm.city_total, 0)) * 100, 2) as market_share_percent,
+            coalesce(sum(sr.subscriptions_count) filter (where sr.access_medium = 'Fibra'), 0)::integer as fiber_count,
+            round((coalesce(sum(sr.subscriptions_count) filter (where sr.access_medium = 'Fibra'), 0)::numeric / nullif(sum(sr.subscriptions_count), 0)) * 100, 2) as fiber_share_percent,
+            coalesce(sum(sr.subscriptions_count) filter (where lower(sr.person_type) like '%jur%dica%'), 0)::integer as b2b_count,
+            coalesce(sum(sr.subscriptions_count) filter (where lower(sr.person_type) like '%f%sica%'), 0)::integer as b2c_count
         from {RECORDS_TABLE} sr
         join latest_period lp on lp.period = sr.period
+        join city_market cm on cm.municipality_code = sr.municipality_code
         where sr.economic_group = :economic_group
-        group by municipality_name, state, municipality_code
+        group by sr.municipality_name, sr.state, sr.municipality_code, cm.city_total
         order by subscriptions_count desc, municipality_name
         limit :limit
         """
