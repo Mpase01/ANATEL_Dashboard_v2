@@ -76,6 +76,16 @@ export async function searchProviders(query) {
   return request(`/providers/search?${params.toString()}`);
 }
 
+export async function searchEconomicGroups(query) {
+  if (demoMode) {
+    const text = query.trim().toLowerCase();
+    return "claro".includes(text) || text === "" ? [{ name: "CLARO", latest_subscriptions_count: 10784341 }] : [];
+  }
+
+  const params = new URLSearchParams({ query, limit: "20" });
+  return request(`/economic-groups/search?${params.toString()}`);
+}
+
 export async function getProviderDashboard(providerId, period = "all") {
   if (demoMode) {
     return buildDemoDashboard(period);
@@ -88,6 +98,24 @@ export async function getProviderDashboard(providerId, period = "all") {
     request(`/providers/${providerId}/technologies?${params.toString()}`),
     request(`/providers/${providerId}/person-types?${params.toString()}`),
     request(`/providers/${providerId}/municipalities?${new URLSearchParams({ period, limit: "20" }).toString()}`),
+  ]);
+
+  return { summary, evolution, technologies, personTypes, municipalities };
+}
+
+export async function getEconomicGroupDashboard(groupName, period = "all") {
+  if (demoMode) {
+    return buildDemoDashboard(period);
+  }
+
+  const params = new URLSearchParams({ group: groupName, period });
+  const municipalityParams = new URLSearchParams({ group: groupName, period, limit: "20" });
+  const [summary, evolution, technologies, personTypes, municipalities] = await Promise.all([
+    request(`/economic-groups/summary?${params.toString()}`),
+    request(`/economic-groups/evolution?${params.toString()}`),
+    request(`/economic-groups/technologies?${params.toString()}`),
+    request(`/economic-groups/person-types?${params.toString()}`),
+    request(`/economic-groups/municipalities?${municipalityParams.toString()}`),
   ]);
 
   return { summary, evolution, technologies, personTypes, municipalities };
