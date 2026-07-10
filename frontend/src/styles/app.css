@@ -321,6 +321,20 @@ th:last-child {
   text-align: right;
 }
 
+.state-row td {
+  background: var(--surface-alt);
+  color: var(--text);
+  font-weight: 800;
+}
+
+.state-row td:first-child {
+  color: var(--primary);
+}
+
+.city-row td:first-child {
+  padding-left: 22px;
+}
+
 @media (max-width: 900px) {
   .toolbar,
   .summary-grid,
