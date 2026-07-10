@@ -20,7 +20,9 @@ const elements = {
   searchButton: document.querySelector("#searchButton"),
   providerSelect: document.querySelector("#providerSelect"),
   periodFilter: document.querySelector("#periodFilter"),
+  granularityFilter: document.querySelector("#granularityFilter"),
   metricSubscriptions: document.querySelector("#metricSubscriptions"),
+  metricClientMix: document.querySelector("#metricClientMix"),
   metricFiber: document.querySelector("#metricFiber"),
   metricMunicipalities: document.querySelector("#metricMunicipalities"),
   metricGrowth: document.querySelector("#metricGrowth"),
@@ -53,6 +55,12 @@ function bindEvents() {
     }
   });
   elements.periodFilter.addEventListener("change", () => {
+    const selectedValue = elements.providerSelect.value;
+    if (selectedValue) {
+      loadDashboard(selectedValue);
+    }
+  });
+  elements.granularityFilter.addEventListener("change", () => {
     const selectedValue = elements.providerSelect.value;
     if (selectedValue) {
       loadDashboard(selectedValue);
@@ -93,9 +101,10 @@ async function runSearch() {
 async function loadDashboard(selectedValue) {
   setStatus("Carregando painel...", "loading");
   try {
-    const dashboard = elements.entityMode.value === "group"
-      ? await getEconomicGroupDashboard(selectedValue, elements.periodFilter.value)
-      : await getProviderDashboard(Number(selectedValue), elements.periodFilter.value);
+    const entity = parseEntityValue(selectedValue);
+    const dashboard = entity.kind === "group"
+      ? await getEconomicGroupDashboard(entity.value, elements.periodFilter.value)
+      : await getProviderDashboard(Number(entity.value), elements.periodFilter.value);
     renderDashboard(dashboard);
     setStatus(isDemoMode() ? "Modo demonstracao" : "Painel atualizado", isDemoMode() ? "loading" : "ok");
   } catch (error) {
@@ -111,31 +120,46 @@ function renderEntityOptions(results, mode) {
     const subscribers = Number(result.latest_subscriptions_count || 0);
     const suffix = subscribers ? ` - ${formatInteger.format(subscribers)} acessos` : "";
     option.textContent = mode === "group"
-      ? `${result.name}${suffix}`
+      ? `${result.name}${result.cnpj ? ` - ${result.cnpj}` : ""}${suffix}`
       : `${result.name} - ${result.cnpj}${suffix}`;
     elements.providerSelect.append(option);
   }
 }
 
 function entityValue(result, mode) {
-  return mode === "group" ? result.name : String(result.id);
+  if (mode === "group" && result.kind === "provider") {
+    return `provider:${result.provider_id}`;
+  }
+  if (mode === "group") {
+    return `group:${result.name}`;
+  }
+  return `provider:${result.id}`;
+}
+
+function parseEntityValue(value) {
+  const [kind, ...rest] = String(value).split(":");
+  return { kind, value: rest.join(":") };
 }
 
 function renderDashboard({ summary, evolution, technologies, personTypes = [], municipalities }) {
-  const lastValue = Number(evolution.at(-1)?.subscriptions_count || summary.subscriptions_count || 0);
-  const growth = Number(summary.growth_percent || 0);
+  const chartRows = buildEvolutionRows(evolution, elements.granularityFilter.value);
+  const lastValue = Number(chartRows.at(-1)?.subscriptions_count || summary.subscriptions_count || 0);
+  const growth = calculateGrowth(evolution.slice(-12));
   const fiberShare = Number(summary.fiber_share_percent || 0);
+  const b2bShare = Number(summary.b2b_share_percent || 0);
+  const b2cShare = Number(summary.b2c_share_percent || 0);
 
   elements.metricSubscriptions.textContent = formatInteger.format(lastValue);
+  elements.metricClientMix.textContent = `B2B ${formatPercent.format(b2bShare)}% | B2C ${formatPercent.format(b2cShare)}%`;
   elements.metricFiber.textContent = `${formatPercent.format(fiberShare)}%`;
   elements.metricMunicipalities.textContent = formatInteger.format(summary.municipalities_count || 0);
   elements.metricGrowth.textContent = `${formatPercent.format(growth)}%`;
   elements.providerSubtitle.textContent = summary.cnpj
     ? `${summary.name} - CNPJ ${summary.cnpj}`
     : `${summary.name} - Grupo economico`;
-  elements.latestPeriod.textContent = periodLabel(evolution);
+  elements.latestPeriod.textContent = periodLabel(chartRows);
 
-  renderEvolution(evolution);
+  renderEvolution(chartRows);
   renderTechnologies(technologies);
   renderPersonTypes(personTypes);
   renderMunicipalities(municipalities);
@@ -155,14 +179,17 @@ function renderEvolution(rows) {
   elements.evolutionChart.innerHTML = "";
   const maxValue = Math.max(...rows.map((row) => Number(row.subscriptions_count || 0)), 1);
 
+  let previousValue = null;
   for (const row of rows) {
     const value = Number(row.subscriptions_count || 0);
+    const growth = previousValue && previousValue > 0 ? ((value - previousValue) / previousValue) * 100 : null;
+    previousValue = value;
     const item = document.createElement("div");
     item.className = "bar-item";
     item.innerHTML = `
-      <span>${formatPeriod(row.period)}</span>
+      <span>${row.label || formatPeriod(row.period)}</span>
       <div class="bar-track"><div class="bar-fill" style="width: ${(value / maxValue) * 100}%"></div></div>
-      <strong>${formatInteger.format(value)}</strong>
+      <strong>${formatInteger.format(value)}${growth === null ? "" : ` (${formatSignedPercent(growth)})`}</strong>
     `;
     elements.evolutionChart.append(item);
   }
@@ -172,13 +199,11 @@ function renderTechnologies(rows) {
   elements.technologyList.innerHTML = "";
   for (const row of rows) {
     const item = document.createElement("div");
-    const isFiber = String(row.access_medium || "").toLowerCase().includes("fibra")
-      || String(row.technology || "").toLowerCase().includes("ftth");
+    const isFiber = String(row.access_medium || "").toLowerCase().includes("fibra");
     item.className = `stack-item${isFiber ? " stack-item-featured" : ""}`;
     item.innerHTML = `
       <div>
-        <strong>${row.technology || "-"}</strong>
-        <span>${row.access_medium || "-"}</span>
+        <strong>${row.access_medium || "-"}</strong>
       </div>
       <div class="stack-numbers">
         <strong>${formatInteger.format(row.subscriptions_count || 0)}</strong>
@@ -194,7 +219,8 @@ function renderPersonTypes(rows) {
   for (const row of rows) {
     const item = document.createElement("div");
     const label = String(row.person_type || "-");
-    const isBusiness = label.toLowerCase().includes("juridica");
+    const normalizedLabel = normalizeText(label);
+    const isBusiness = normalizedLabel.includes("juridica");
     item.className = `stack-item${isBusiness ? " stack-item-featured" : ""}`;
     item.innerHTML = `
       <div>
@@ -218,19 +244,64 @@ function renderMunicipalities(rows) {
       <td>${row.municipality_name}</td>
       <td>${row.state}</td>
       <td>${formatInteger.format(row.subscriptions_count || 0)}</td>
+      <td>${formatPercent.format(Number(row.market_share_percent || 0))}%</td>
+      <td>${formatInteger.format(row.fiber_count || 0)} (${formatPercent.format(Number(row.fiber_share_percent || 0))}%)</td>
+      <td>${formatInteger.format(row.b2b_count || 0)}</td>
+      <td>${formatInteger.format(row.b2c_count || 0)}</td>
     `;
     elements.municipalityRows.append(tr);
   }
 }
 
+function buildEvolutionRows(rows, granularity) {
+  if (granularity !== "quarter") {
+    return rows.map((row) => ({ ...row, label: formatPeriod(row.period) }));
+  }
+
+  const grouped = new Map();
+  for (const row of rows) {
+    const [year, monthText] = String(row.period).split("-");
+    const quarter = Math.ceil(Number(monthText) / 3);
+    const key = `${year}-T${quarter}`;
+    grouped.set(key, {
+      period: row.period,
+      label: `${quarter}T/${year}`,
+      subscriptions_count: Number(row.subscriptions_count || 0),
+    });
+  }
+  return Array.from(grouped.values());
+}
+
+function calculateGrowth(rows) {
+  if (rows.length < 2) {
+    return 0;
+  }
+  const firstValue = Number(rows[0]?.subscriptions_count || 0);
+  const lastValue = Number(rows.at(-1)?.subscriptions_count || 0);
+  return firstValue > 0 ? ((lastValue - firstValue) / firstValue) * 100 : 0;
+}
+
+function formatSignedPercent(value) {
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${formatPercent.format(value)}%`;
+}
+
 function personTypeLabel(value) {
-  if (value.toLowerCase().includes("juridica")) {
+  const normalizedValue = normalizeText(value);
+  if (normalizedValue.includes("juridica")) {
     return "Pessoa Juridica";
   }
-  if (value.toLowerCase().includes("fisica")) {
+  if (normalizedValue.includes("fisica")) {
     return "Pessoa Fisica";
   }
   return value;
+}
+
+function normalizeText(value) {
+  return String(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 }
 
 function formatPeriod(value) {
