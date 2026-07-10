@@ -6,6 +6,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
+import unicodedata
 
 from .anatel_csv import SubscriptionRecord
 
@@ -19,7 +20,6 @@ class AggregatedSubscriptionRecord:
     municipality_code: str
     municipality_name: str
     state: str
-    technology: str
     access_medium: str
     person_type: str
     subscriptions_count: int
@@ -56,8 +56,7 @@ def aggregate_subscription_records_with_stats(
             record.municipality_code,
             record.municipality_name,
             record.state,
-            record.technology,
-            record.access_medium,
+            simplify_access_medium(record.access_medium),
             record.person_type,
         )
         totals[key] += record.subscriptions_count
@@ -71,7 +70,6 @@ def aggregate_subscription_records_with_stats(
             municipality_code=str(municipality_code),
             municipality_name=str(municipality_name),
             state=str(state),
-            technology=str(technology),
             access_medium=str(access_medium),
             person_type=str(person_type),
             subscriptions_count=subscriptions_count,
@@ -84,7 +82,6 @@ def aggregate_subscription_records_with_stats(
             municipality_code,
             municipality_name,
             state,
-            technology,
             access_medium,
             person_type,
         ), subscriptions_count in sorted(totals.items())
@@ -122,7 +119,6 @@ def build_aggregated_subscription_rows(
                 "municipality_code": record.municipality_code,
                 "municipality_name": record.municipality_name,
                 "state": record.state,
-                "technology": record.technology,
                 "access_medium": record.access_medium,
                 "person_type": record.person_type,
                 "subscriptions_count": record.subscriptions_count,
@@ -130,3 +126,15 @@ def build_aggregated_subscription_rows(
         )
 
     return rows
+
+
+def simplify_access_medium(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value.strip().lower())
+    text = normalized.encode("ascii", "ignore").decode("ascii")
+    if "fibra" in text:
+        return "Fibra"
+    if "radio" in text:
+        return "Radio"
+    if "coaxial" in text or "cabo" in text:
+        return "Cabo coaxial"
+    return "Outros"
