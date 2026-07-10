@@ -15,7 +15,6 @@ create table if not exists aggregated_subscription_records (
     municipality_code varchar(7) not null,
     municipality_name text not null,
     state char(2) not null,
-    technology text not null,
     access_medium text not null,
     person_type text not null,
     subscriptions_count bigint not null,
@@ -32,7 +31,6 @@ create table if not exists aggregated_subscription_records (
         municipality_code,
         municipality_name,
         state,
-        technology,
         access_medium,
         person_type
     )
@@ -52,9 +50,6 @@ create index if not exists idx_aggregated_subscription_records_state
 
 create index if not exists idx_aggregated_subscription_records_municipality
     on aggregated_subscription_records (municipality_code);
-
-create index if not exists idx_aggregated_subscription_records_technology
-    on aggregated_subscription_records (technology);
 
 create index if not exists idx_aggregated_subscription_records_access_medium
     on aggregated_subscription_records (access_medium);
