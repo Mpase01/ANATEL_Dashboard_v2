@@ -68,6 +68,25 @@ def show_status() -> None:
             ).scalar_one()
             print(f"aggregated_subscription_records: {aggregate_count}")
             print(f"aggregated_subscriptions_sum: {aggregate_total}")
+            group_column_exists = connection.execute(
+                text(
+                    """
+                    select exists (
+                        select 1
+                        from information_schema.columns
+                        where table_schema = 'public'
+                          and table_name = 'aggregated_subscription_records'
+                          and column_name = 'economic_group'
+                    )
+                    """
+                )
+            ).scalar_one()
+            print(f"aggregated_economic_group_column_exists: {group_column_exists}")
+            if group_column_exists:
+                groups_count = connection.execute(
+                    text("select count(distinct economic_group)::bigint from public.aggregated_subscription_records")
+                ).scalar_one()
+                print(f"aggregated_economic_groups: {groups_count}")
 
 
 def apply_aggregated_schema() -> None:
@@ -87,11 +106,27 @@ def clear_detailed_records() -> None:
     print(f"subscription_records_deleted: {before}")
 
 
+def reset_aggregated_table() -> None:
+    engine = create_database_engine()
+    with engine.begin() as connection:
+        existed = connection.execute(
+            text("select to_regclass('public.aggregated_subscription_records') is not null")
+        ).scalar_one()
+        if existed:
+            connection.execute(text("drop table public.aggregated_subscription_records"))
+
+        schema_path = ROOT_DIR / "database" / "aggregated_schema.sql"
+        connection.exec_driver_sql(schema_path.read_text(encoding="utf-8"))
+
+    print(f"aggregated_subscription_records_recreated: {True}")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Manage aggregated ANATEL dashboard database tables.")
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("status")
     subparsers.add_parser("apply-schema")
+    subparsers.add_parser("reset-aggregated-table")
 
     clear_parser = subparsers.add_parser("clear-detailed-records")
     clear_parser.add_argument("--yes-i-understand", action="store_true")
@@ -105,6 +140,8 @@ def main() -> None:
         show_status()
     elif args.command == "apply-schema":
         apply_aggregated_schema()
+    elif args.command == "reset-aggregated-table":
+        reset_aggregated_table()
     elif args.command == "clear-detailed-records":
         if not args.yes_i_understand:
             raise SystemExit("Refusing to clear detailed records without --yes-i-understand.")
