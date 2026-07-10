@@ -238,19 +238,47 @@ function renderPersonTypes(rows) {
 
 function renderMunicipalities(rows) {
   elements.municipalityRows.innerHTML = "";
-  for (const row of rows) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${row.municipality_name}</td>
-      <td>${row.state}</td>
-      <td>${formatInteger.format(row.subscriptions_count || 0)}</td>
-      <td>${formatPercent.format(Number(row.market_share_percent || 0))}%</td>
-      <td>${formatInteger.format(row.fiber_count || 0)} (${formatPercent.format(Number(row.fiber_share_percent || 0))}%)</td>
-      <td>${formatInteger.format(row.b2b_count || 0)}</td>
-      <td>${formatInteger.format(row.b2c_count || 0)}</td>
+  for (const group of groupMunicipalitiesByState(rows)) {
+    const stateRow = document.createElement("tr");
+    stateRow.className = "state-row";
+    stateRow.innerHTML = `
+      <td>${group.state}</td>
+      <td>${formatRank(group.summary.state_rank_position)}</td>
+      <td>${formatInteger.format(group.summary.state_subscriptions_count || 0)}</td>
+      <td>${formatPercent.format(Number(group.summary.state_market_share_percent || 0))}%</td>
+      <td>${formatPercent.format(Number(group.summary.state_fiber_share_percent || 0))}%</td>
+      <td>${formatInteger.format(group.summary.state_b2b_count || 0)}</td>
+      <td>${formatInteger.format(group.summary.state_b2c_count || 0)}</td>
     `;
-    elements.municipalityRows.append(tr);
+    elements.municipalityRows.append(stateRow);
+
+    for (const row of group.rows) {
+      const tr = document.createElement("tr");
+      tr.className = "city-row";
+      tr.innerHTML = `
+        <td>${row.municipality_name}</td>
+        <td>${formatRank(row.rank_position)}</td>
+        <td>${formatInteger.format(row.subscriptions_count || 0)}</td>
+        <td>${formatPercent.format(Number(row.market_share_percent || 0))}%</td>
+        <td>${formatPercent.format(Number(row.fiber_share_percent || 0))}%</td>
+        <td>${formatInteger.format(row.b2b_count || 0)}</td>
+        <td>${formatInteger.format(row.b2c_count || 0)}</td>
+      `;
+      elements.municipalityRows.append(tr);
+    }
   }
+}
+
+function groupMunicipalitiesByState(rows) {
+  const groups = new Map();
+  for (const row of rows) {
+    const state = row.state || "-";
+    if (!groups.has(state)) {
+      groups.set(state, { state, summary: row, rows: [] });
+    }
+    groups.get(state).rows.push(row);
+  }
+  return Array.from(groups.values());
 }
 
 function buildEvolutionRows(rows, granularity) {
@@ -284,6 +312,11 @@ function calculateGrowth(rows) {
 function formatSignedPercent(value) {
   const sign = value > 0 ? "+" : "";
   return `${sign}${formatPercent.format(value)}%`;
+}
+
+function formatRank(value) {
+  const rank = Number(value || 0);
+  return rank > 0 ? `${rank}o` : "-";
 }
 
 function personTypeLabel(value) {
