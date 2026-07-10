@@ -16,13 +16,20 @@
         <span class="status" id="apiStatus">Abrindo painel</span>
       </header>
 
-      <section class="toolbar" aria-label="Busca de prestadora">
+      <section class="toolbar" aria-label="Busca do dashboard">
         <label class="search-field">
-          <span>Prestadora ou CNPJ</span>
+          <span>Visao</span>
+          <select id="entityMode" aria-label="Tipo de visao">
+            <option value="group">Grupo economico</option>
+            <option value="provider">Prestadora/CNPJ</option>
+          </select>
+        </label>
+        <label class="search-field">
+          <span>Buscar</span>
           <input id="providerQuery" type="search" value="CLARO" autocomplete="off" />
         </label>
         <button id="searchButton" type="button">Buscar</button>
-        <select id="providerSelect" aria-label="Prestadora encontrada"></select>
+        <select id="providerSelect" aria-label="Resultado encontrado"></select>
         <label class="search-field">
           <span>Periodo</span>
           <select id="periodFilter" aria-label="Recorte temporal">
