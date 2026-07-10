@@ -11,6 +11,7 @@ create table if not exists aggregated_subscription_records (
     period date not null,
     cnpj varchar(14) not null,
     company_name text not null,
+    economic_group text not null,
     municipality_code varchar(7) not null,
     municipality_name text not null,
     state char(2) not null,
@@ -27,6 +28,7 @@ create table if not exists aggregated_subscription_records (
         period,
         cnpj,
         company_name,
+        economic_group,
         municipality_code,
         municipality_name,
         state,
@@ -38,6 +40,9 @@ create table if not exists aggregated_subscription_records (
 
 create index if not exists idx_aggregated_subscription_records_provider_period
     on aggregated_subscription_records (provider_id, period);
+
+create index if not exists idx_aggregated_subscription_records_group_period
+    on aggregated_subscription_records (economic_group, period);
 
 create index if not exists idx_aggregated_subscription_records_period
     on aggregated_subscription_records (period);
