@@ -14,6 +14,7 @@ from .anatel_csv import SubscriptionRecord
 class AggregatedSubscriptionRecord:
     cnpj: str
     company_name: str
+    economic_group: str
     period: date
     municipality_code: str
     municipality_name: str
@@ -50,6 +51,7 @@ def aggregate_subscription_records_with_stats(
         key = (
             record.cnpj,
             record.company_name,
+            record.economic_group,
             record.period,
             record.municipality_code,
             record.municipality_name,
@@ -64,6 +66,7 @@ def aggregate_subscription_records_with_stats(
         AggregatedSubscriptionRecord(
             cnpj=str(cnpj),
             company_name=str(company_name),
+            economic_group=str(economic_group),
             period=period,
             municipality_code=str(municipality_code),
             municipality_name=str(municipality_name),
@@ -76,6 +79,7 @@ def aggregate_subscription_records_with_stats(
         for (
             cnpj,
             company_name,
+            economic_group,
             period,
             municipality_code,
             municipality_name,
@@ -113,6 +117,7 @@ def build_aggregated_subscription_rows(
                 "import_file_id": import_file_id,
                 "cnpj": record.cnpj,
                 "company_name": record.company_name,
+                "economic_group": record.economic_group,
                 "period": record.period,
                 "municipality_code": record.municipality_code,
                 "municipality_name": record.municipality_name,
