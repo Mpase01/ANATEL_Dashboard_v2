@@ -102,6 +102,9 @@ def create_app() -> FastAPI:
             {
                 "name": result.name,
                 "latest_subscriptions_count": result.latest_subscriptions_count,
+                "kind": result.kind,
+                "provider_id": result.provider_id,
+                "cnpj": result.cnpj,
             }
             for result in results
         ]
