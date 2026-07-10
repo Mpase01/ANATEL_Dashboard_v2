@@ -9,12 +9,18 @@ from sqlalchemy import text
 from app.core.config import get_settings
 from app.db.session import session_scope
 from app.repositories.dashboard import (
+    get_economic_group_evolution,
+    get_economic_group_municipalities,
+    get_economic_group_person_types,
+    get_economic_group_summary,
+    get_economic_group_technologies,
     get_provider_evolution,
     get_provider_municipalities,
     get_provider_person_types,
     get_provider_summary,
     get_provider_technologies,
 )
+from app.repositories.economic_groups import search_economic_groups
 from app.repositories.providers import search_providers
 
 
@@ -81,6 +87,25 @@ def create_app() -> FastAPI:
             for result in results
         ]
 
+    @app.get("/economic-groups/search")
+    def economic_groups_search(
+        query: str = Query(min_length=1),
+        limit: int = Query(default=20, ge=1, le=50),
+    ) -> list[dict[str, object]]:
+        try:
+            with session_scope() as session:
+                results = search_economic_groups(session, query=query, limit=limit)
+        except RuntimeError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+        return [
+            {
+                "name": result.name,
+                "latest_subscriptions_count": result.latest_subscriptions_count,
+            }
+            for result in results
+        ]
+
     @app.get("/providers/{provider_id}/summary")
     def provider_summary(
         provider_id: int,
@@ -140,6 +165,71 @@ def create_app() -> FastAPI:
                 return get_provider_municipalities(
                     session,
                     provider_id=provider_id,
+                    period=period,
+                    limit=limit,
+                )
+        except RuntimeError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    @app.get("/economic-groups/summary")
+    def economic_group_summary(
+        group: str = Query(min_length=1),
+        period: str = Query(default="all", pattern="^(all|last3|latest)$"),
+    ) -> dict[str, object]:
+        try:
+            with session_scope() as session:
+                summary = get_economic_group_summary(session, economic_group=group, period=period)
+        except RuntimeError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+        if summary is None:
+            raise HTTPException(status_code=404, detail="Economic group not found.")
+        return summary
+
+    @app.get("/economic-groups/evolution")
+    def economic_group_evolution(
+        group: str = Query(min_length=1),
+        period: str = Query(default="all", pattern="^(all|last3|latest)$"),
+    ) -> list[dict[str, object]]:
+        try:
+            with session_scope() as session:
+                return get_economic_group_evolution(session, economic_group=group, period=period)
+        except RuntimeError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    @app.get("/economic-groups/technologies")
+    def economic_group_technologies(
+        group: str = Query(min_length=1),
+        period: str = Query(default="all", pattern="^(all|last3|latest)$"),
+    ) -> list[dict[str, object]]:
+        try:
+            with session_scope() as session:
+                return get_economic_group_technologies(session, economic_group=group, period=period)
+        except RuntimeError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    @app.get("/economic-groups/person-types")
+    def economic_group_person_types(
+        group: str = Query(min_length=1),
+        period: str = Query(default="all", pattern="^(all|last3|latest)$"),
+    ) -> list[dict[str, object]]:
+        try:
+            with session_scope() as session:
+                return get_economic_group_person_types(session, economic_group=group, period=period)
+        except RuntimeError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    @app.get("/economic-groups/municipalities")
+    def economic_group_municipalities(
+        group: str = Query(min_length=1),
+        period: str = Query(default="all", pattern="^(all|last3|latest)$"),
+        limit: int = Query(default=20, ge=1, le=100),
+    ) -> list[dict[str, object]]:
+        try:
+            with session_scope() as session:
+                return get_economic_group_municipalities(
+                    session,
+                    economic_group=group,
                     period=period,
                     limit=limit,
                 )
