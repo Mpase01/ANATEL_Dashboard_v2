@@ -1,4 +1,11 @@
-import { checkHealth, getProviderDashboard, isDemoMode, searchProviders } from "../services/api.js";
+import {
+  checkHealth,
+  getEconomicGroupDashboard,
+  getProviderDashboard,
+  isDemoMode,
+  searchEconomicGroups,
+  searchProviders,
+} from "../services/api.js";
 
 const formatInteger = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 });
 const formatPercent = new Intl.NumberFormat("pt-BR", {
@@ -8,6 +15,7 @@ const formatPercent = new Intl.NumberFormat("pt-BR", {
 
 const elements = {
   apiStatus: document.querySelector("#apiStatus"),
+  entityMode: document.querySelector("#entityMode"),
   providerQuery: document.querySelector("#providerQuery"),
   searchButton: document.querySelector("#searchButton"),
   providerSelect: document.querySelector("#providerSelect"),
@@ -32,21 +40,22 @@ async function init() {
 
 function bindEvents() {
   elements.searchButton.addEventListener("click", runSearch);
+  elements.entityMode.addEventListener("change", runSearch);
   elements.providerQuery.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       runSearch();
     }
   });
   elements.providerSelect.addEventListener("change", () => {
-    const providerId = Number(elements.providerSelect.value);
-    if (providerId) {
-      loadDashboard(providerId);
+    const selectedValue = elements.providerSelect.value;
+    if (selectedValue) {
+      loadDashboard(selectedValue);
     }
   });
   elements.periodFilter.addEventListener("change", () => {
-    const providerId = Number(elements.providerSelect.value);
-    if (providerId) {
-      loadDashboard(providerId);
+    const selectedValue = elements.providerSelect.value;
+    if (selectedValue) {
+      loadDashboard(selectedValue);
     }
   });
 }
@@ -64,26 +73,29 @@ async function runSearch() {
 
   setStatus("Buscando...", "loading");
   try {
-    const providers = await searchProviders(query);
-    renderProviderOptions(providers);
+    const mode = elements.entityMode.value;
+    const results = mode === "group" ? await searchEconomicGroups(query) : await searchProviders(query);
+    renderEntityOptions(results, mode);
     setStatus(
-      providers.length ? (isDemoMode() ? "Modo demonstracao" : "Busca concluida") : "Nenhum resultado",
-      providers.length ? "ok" : "error",
+      results.length ? (isDemoMode() ? "Modo demonstracao" : "Busca concluida") : "Nenhum resultado",
+      results.length ? "ok" : "error",
     );
 
-    if (providers[0]) {
-      elements.providerSelect.value = String(providers[0].id);
-      await loadDashboard(providers[0].id);
+    if (results[0]) {
+      elements.providerSelect.value = entityValue(results[0], mode);
+      await loadDashboard(elements.providerSelect.value);
     }
   } catch (error) {
     setStatus("Erro na busca", "error");
   }
 }
 
-async function loadDashboard(providerId) {
+async function loadDashboard(selectedValue) {
   setStatus("Carregando painel...", "loading");
   try {
-    const dashboard = await getProviderDashboard(providerId, elements.periodFilter.value);
+    const dashboard = elements.entityMode.value === "group"
+      ? await getEconomicGroupDashboard(selectedValue, elements.periodFilter.value)
+      : await getProviderDashboard(Number(selectedValue), elements.periodFilter.value);
     renderDashboard(dashboard);
     setStatus(isDemoMode() ? "Modo demonstracao" : "Painel atualizado", isDemoMode() ? "loading" : "ok");
   } catch (error) {
@@ -91,16 +103,22 @@ async function loadDashboard(providerId) {
   }
 }
 
-function renderProviderOptions(providers) {
+function renderEntityOptions(results, mode) {
   elements.providerSelect.innerHTML = "";
-  for (const provider of providers) {
+  for (const result of results) {
     const option = document.createElement("option");
-    option.value = provider.id;
-    const subscribers = Number(provider.latest_subscriptions_count || 0);
+    option.value = entityValue(result, mode);
+    const subscribers = Number(result.latest_subscriptions_count || 0);
     const suffix = subscribers ? ` - ${formatInteger.format(subscribers)} acessos` : "";
-    option.textContent = `${provider.name} - ${provider.cnpj}${suffix}`;
+    option.textContent = mode === "group"
+      ? `${result.name}${suffix}`
+      : `${result.name} - ${result.cnpj}${suffix}`;
     elements.providerSelect.append(option);
   }
+}
+
+function entityValue(result, mode) {
+  return mode === "group" ? result.name : String(result.id);
 }
 
 function renderDashboard({ summary, evolution, technologies, personTypes = [], municipalities }) {
@@ -112,7 +130,9 @@ function renderDashboard({ summary, evolution, technologies, personTypes = [], m
   elements.metricFiber.textContent = `${formatPercent.format(fiberShare)}%`;
   elements.metricMunicipalities.textContent = formatInteger.format(summary.municipalities_count || 0);
   elements.metricGrowth.textContent = `${formatPercent.format(growth)}%`;
-  elements.providerSubtitle.textContent = `${summary.name} - CNPJ ${summary.cnpj}`;
+  elements.providerSubtitle.textContent = summary.cnpj
+    ? `${summary.name} - CNPJ ${summary.cnpj}`
+    : `${summary.name} - Grupo economico`;
   elements.latestPeriod.textContent = periodLabel(evolution);
 
   renderEvolution(evolution);
