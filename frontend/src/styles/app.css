@@ -107,7 +107,7 @@ h2 {
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) auto minmax(260px, 1fr) minmax(170px, 0.65fr);
+  grid-template-columns: minmax(160px, 0.55fr) minmax(220px, 1fr) auto minmax(260px, 1fr) minmax(170px, 0.65fr);
   gap: 10px;
   align-items: end;
   padding: 14px;
